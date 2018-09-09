@@ -169,7 +169,15 @@ class MOIPProblem:
                             branches = ineql.split(';')
                             if_branch = branches[0]
                             else_branch = branches[1]
-                            print (if_branch,else_branch)
+                            #print (if_branch,else_branch)
+                            if_parts = re.findall("{(.+?)}", if_branch)
+                            if_condition = if_parts[0]
+                            if_code = if_parts[1]
+                            else_parts = re.findall("{(.+?)}", else_branch)
+                            else_code = else_parts[0]
+                            conditions = (if_condition,if_code,else_code)
+                            M = self.__private_calculteM__()
+                            MOIPProblem.bigMConversion(conditions, M, self.sparseInequationsMapList)
                 line = f.readline()
                 
         self.attributeMatrix =self.__private_convertDenseLise__(self.objectiveSparseMapList)
@@ -177,6 +185,11 @@ class MOIPProblem:
             raise Exception('input not consistent', 'eggs')
         self.reOrderObjsByRange()
         return      
+    
+    @classmethod
+    def bigMConversion(cls, conditions, M, inequationsMapList): 
+        
+        return inequationsMapList
     
     def reOrderObjsByRange(self):
         objRangeMap = {}
@@ -200,7 +213,14 @@ class MOIPProblem:
         self.objectiveSparseMapList[targetPos] = temp 
         temp = self.attributeMatrix[0]
         self.attributeMatrix[0] = self.attributeMatrix[targetPos]
-        self.attributeMatrix[targetPos] = temp             
+        self.attributeMatrix[targetPos] = temp
+
+    def __private_calculteM__(self):
+        M_obj = self.objectNames.index('totalNumber')
+        if M_obj == -1: 
+            M_obj= 0
+        M = sum(self.attributeMatrix[M_obj])
+        return M
         
     def __private_calculteUBLB__(self,obj):
         ub = 0.0
