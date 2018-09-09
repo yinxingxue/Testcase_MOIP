@@ -171,10 +171,10 @@ class MOIPProblem:
                             else_branch = branches[1]
                             #print (if_branch,else_branch)
                             if_parts = re.findall("{(.+?)}", if_branch)
-                            if_condition = if_parts[0]
-                            if_code = if_parts[1]
+                            if_condition = if_parts[0].strip()
+                            if_code = if_parts[1].strip()
                             else_parts = re.findall("{(.+?)}", else_branch)
-                            else_code = else_parts[0]
+                            else_code = else_parts[0].strip()
                             conditions = (if_condition,if_code,else_code)
                             M = self.__private_calculteM__()
                             MOIPProblem.bigMConversion(conditions, M, self.sparseInequationsMapList)
@@ -187,17 +187,48 @@ class MOIPProblem:
         return      
     
     @classmethod
-    def bigMConversion(cls, conditions, M, inequationsMapList): 
-        conditions = conditions[0].split(',')
+    def bigMConversion(cls, statements, M, inequationsMapList): 
+        conditions = statements[0].split(',')
         conditionLeftVars = conditions[0: len(conditions)-1 ]     
-        conditionRightVal = conditions[-1]
-        ifAffects = conditions[1].split(',')
-        ifAffectedLeftVar = ifAffects[0]
-        ifAffectedRightVal = ifAffects[1]
-        elseAffects = conditions[2].split(',')
-        elseAffectedLeftVar = elseAffects[0]
-        elseAffectedRightVal = elseAffects[1]
+        conditionRightVal = conditions[-1].strip()
+        ifAffects = statements[1].split(',')
+        ifAffectedLeftVar = ifAffects[0].strip()
+        ifAffectedRightVal = ifAffects[1].strip()
+        elseAffects = statements[2].split(',')
+        elseAffectedLeftVar = elseAffects[0].strip()
+        elseAffectedRightVal = elseAffects[1].strip()
+        
+        conditionLeftVarsMap = MOIPProblem.loadMap(conditionLeftVars)
+        conditionRightValPair = MOIPProblem.loadPair(conditionRightVal)
+        ifAffectedLeftVarPair = MOIPProblem.loadPair(ifAffectedLeftVar)
+        ifAffectedRightValPair = MOIPProblem.loadPair(ifAffectedRightVal)
+        #add the first part due to the conversion of the big M solution 
+        derivedIneql = {}
+        for leftVar in conditionLeftVarsMap:
+            derivedIneql[leftVar] = -1.0 * conditionLeftVarsMap[leftVar]
+        derivedIneql[ifAffectedLeftVarPair[0]] = M* ifAffectedLeftVarPair[1]
+        derivedIneql[ifAffectedRightValPair[0]] = M* ifAffectedRightValPair[1] - conditionRightValPair[1]
+        
         return inequationsMapList
+    
+    @classmethod
+    def loadMap(cls, mapList):
+        resultMap = {}
+        for item in mapList: 
+            parts = item.split('=')
+            key = int(parts[0].strip())
+            value = float(parts[1].strip())
+            resultMap[key] = value
+        return resultMap
+    
+    @classmethod
+    def loadPair(cls, stringItem):
+        resultPair = None     
+        parts = stringItem.split('=')
+        key = int(parts[0].strip())
+        value = float(parts[1].strip())
+        resultPair = (key,value)
+        return resultPair
     
     def reOrderObjsByRange(self):
         objRangeMap = {}
@@ -222,7 +253,7 @@ class MOIPProblem:
         temp = self.attributeMatrix[0]
         self.attributeMatrix[0] = self.attributeMatrix[targetPos]
         self.attributeMatrix[targetPos] = temp
-
+    
     def __private_calculteM__(self):
         M_obj = self.objectNames.index('totalNumber')
         if M_obj == -1: 
