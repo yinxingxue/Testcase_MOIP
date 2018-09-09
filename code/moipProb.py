@@ -188,7 +188,15 @@ class MOIPProblem:
     
     @classmethod
     def bigMConversion(cls, conditions, M, inequationsMapList): 
-        
+        conditions = conditions[0].split(',')
+        conditionLeftVars = conditions[0: len(conditions)-1 ]     
+        conditionRightVal = conditions[-1]
+        ifAffects = conditions[1].split(',')
+        ifAffectedLeftVar = ifAffects[0]
+        ifAffectedRightVal = ifAffects[1]
+        elseAffects = conditions[2].split(',')
+        elseAffectedLeftVar = elseAffects[0]
+        elseAffectedRightVal = elseAffects[1]
         return inequationsMapList
     
     def reOrderObjsByRange(self):
