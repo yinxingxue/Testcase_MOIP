@@ -199,15 +199,26 @@ class MOIPProblem:
         elseAffectedRightVal = elseAffects[1].strip()
         
         conditionLeftVarsMap = MOIPProblem.loadMap(conditionLeftVars)
-        conditionRightValPair = MOIPProblem.loadPair(conditionRightVal)
+        conditionRightValPair = MOIPProblem.loadPairForGEop(conditionRightVal)
         ifAffectedLeftVarPair = MOIPProblem.loadPair(ifAffectedLeftVar)
         ifAffectedRightValPair = MOIPProblem.loadPair(ifAffectedRightVal)
+        elseAffectedLeftVarPair = MOIPProblem.loadPair(elseAffectedLeftVar)
+        elseAffectedRightValPair = MOIPProblem.loadPair(elseAffectedRightVal)
         #add the first part due to the conversion of the big M solution 
         derivedIneql = {}
         for leftVar in conditionLeftVarsMap:
             derivedIneql[leftVar] = -1.0 * conditionLeftVarsMap[leftVar]
         derivedIneql[ifAffectedLeftVarPair[0]] = M* ifAffectedLeftVarPair[1]
         derivedIneql[ifAffectedRightValPair[0]] = M* ifAffectedRightValPair[1] - conditionRightValPair[1]
+        inequationsMapList.append(derivedIneql)
+        
+        #add the second part due to the conversion of the big M solution 
+        derivedIneql2 = {}
+        for leftVar in conditionLeftVarsMap:
+            derivedIneql2[leftVar] = 1.0 * conditionLeftVarsMap[leftVar]
+        derivedIneql2[elseAffectedLeftVarPair[0]] = -1.0 * M * elseAffectedLeftVarPair[1]
+        derivedIneql2[elseAffectedRightValPair[0]] = elseAffectedRightValPair[1]
+        inequationsMapList.append(derivedIneql2)
         
         return inequationsMapList
     
@@ -220,6 +231,15 @@ class MOIPProblem:
             value = float(parts[1].strip())
             resultMap[key] = value
         return resultMap
+    
+    @classmethod
+    def loadPairForGEop(cls, stringItem):
+        resultPair = None     
+        pos = stringItem.find('>=')
+        key = int(stringItem[0:pos].strip())
+        value = float(stringItem[pos+2].strip())
+        resultPair = (key,value)
+        return resultPair
     
     @classmethod
     def loadPair(cls, stringItem):
@@ -258,7 +278,7 @@ class MOIPProblem:
         M_obj = self.objectNames.index('totalNumber')
         if M_obj == -1: 
             M_obj= 0
-        M = sum(self.attributeMatrix[M_obj])
+        M = sum(self.objectiveSparseMapList[M_obj].values())+1
         return M
         
     def __private_calculteUBLB__(self,obj):
