@@ -4,6 +4,8 @@ Created on Mon Sep 10 11:48:10 2018
 
 @author: Yinxing Xue
 """
+from collections import Counter
+
 class TestcaseDataReader():  
     'the class to read the raw data of the test case data, including the test case coverage, fault information, etc.'
     
@@ -53,6 +55,72 @@ class TestcaseDataReader():
     def load(self):
         'first read all the test case names'
         self.loadRtimeFile()
+        self.loadCovFile()
+        self.loadFaultFile()
+        
+        print (self.timeofTestcase)
+        print (self.stmtsofTestcaseMap)
+        print (self.faultToTestcaseMap)
+        return 
+    
+    def loadFaultFile(self):
+        line = self.faultFile.readline()             # 调用文件的 readline()方法
+        while line:
+            #for testing purpose
+            print(line, end = '')
+            parts = line.split(':')
+            #example: t2:2 3
+            testCaseName= parts[0].strip()
+            faults = parts[1].split(' ')
+            for fault in faults:
+                faultName= 'f'+fault.strip()
+                if faultName in self.faultToTestcaseMap:
+                    testcaseList= self.faultToTestcaseMap[faultName]
+                    testcaseList.append(testCaseName)
+                else: 
+                    testcaseList = []
+                    testcaseList.append(testCaseName)
+                    self.faultToTestcaseMap[faultName]=testcaseList
+            line = self.faultFile.readline()
+        self.faultFile.close()
+        'check there exist no duplication in the map'
+        for faultName in self.faultToTestcaseMap:
+            testcaseList= self.faultToTestcaseMap[faultName]
+            cou=Counter(testcaseList)
+            first=cou.most_common(1)
+            if first[0][1]>1:
+                print ('input have duplicates!!!')
+                exit(-1) 
+        return 
+    
+    def loadCovFile(self):
+        line = self.covFile.readline()             # 调用文件的 readline()方法
+        while line:
+            #for testing purpose
+            print(line, end = '')
+            parts = line.split(':')
+            #example: t2:2 3
+            testCaseName= parts[0].strip()
+            stmts = parts[1].split(' ')
+            for stmt in stmts:
+                stmtName= 's'+stmt.strip()
+                if stmtName in self.stmtsofTestcaseMap:
+                    testcaseList= self.stmtsofTestcaseMap[stmtName]
+                    testcaseList.append(testCaseName)
+                else: 
+                    testcaseList = []
+                    testcaseList.append(testCaseName)
+                    self.stmtsofTestcaseMap[stmtName]=testcaseList
+            line = self.covFile.readline()
+        self.covFile.close()
+        'check there exist no duplication in the map'
+        for stmtName in self.stmtsofTestcaseMap:
+            testcaseList= self.stmtsofTestcaseMap[stmtName]
+            cou=Counter(testcaseList)
+            first=cou.most_common(1)
+            if first[0][1]>1:
+                print ('input have duplicates!!!')
+                exit(-1) 
         return 
     
     def loadRtimeFile(self):
@@ -69,15 +137,13 @@ class TestcaseDataReader():
         self.rtimeFile.close()
         return 
     
-    
-    
     def save(self,outputPath):
         
         return 
     
     
 if __name__ == "__main__":
-    reader = TestcaseDataReader('C:/Users/allen/Documents/GitHub/Nemo/example')
+    reader = TestcaseDataReader('../../Nemo/example')
     reader.load()
 else:
     print("testcaseDataReader.py is being imported into another module")
