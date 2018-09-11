@@ -178,7 +178,7 @@ class MOIPProblem:
                             else_parts = re.findall("{(.+?)}", else_branch)
                             else_code = else_parts[0].strip()
                             conditions = (if_condition,if_code,else_code)                           
-                            MOIPProblem.bigMConversion(conditions, M, self.sparseInequationsMapList)
+                            MOIPProblem.bigMConversion(conditions, M, varCount, self.sparseInequationsMapList)
                 line = f.readline()
                 
         self.attributeMatrix =self.__private_convertDenseLise__(self.objectiveSparseMapList)
@@ -188,19 +188,25 @@ class MOIPProblem:
         return      
     
     @classmethod
-    def bigMConversion(cls, statements, M, inequationsMapList): 
+    def bigMConversion(cls, statements, M, varCount, inequationsMapList): 
         conditions = statements[0].split(',')
-        conditionLeftVars = conditions[0: len(conditions)-1 ]     
+        conditions = MOIPProblem.reorderConditions(conditions,varCount)
+        
+        conditionLeftVars = conditions[0: len(conditions)-1 ] 
+        'bug fixed here, the last item is not necessary to contain the right side of the condition'
+        #example 
         conditionRightVal = conditions[-1].strip()
         ifAffects = statements[1].split(',')
+        ifAffects = MOIPProblem.reorderConditions(ifAffects,varCount)
         ifAffectedLeftVar = ifAffects[0].strip()
         ifAffectedRightVal = ifAffects[1].strip()
         elseAffects = statements[2].split(',')
+        elseAffects = MOIPProblem.reorderConditions(elseAffects,varCount)
         elseAffectedLeftVar = elseAffects[0].strip()
         elseAffectedRightVal = elseAffects[1].strip()
         
         conditionLeftVarsMap = MOIPProblem.loadMap(conditionLeftVars)
-        conditionRightValPair = MOIPProblem.loadPairForGEop(conditionRightVal)
+        conditionRightValPair = MOIPProblem.loadPair(conditionRightVal)
         ifAffectedLeftVarPair = MOIPProblem.loadPair(ifAffectedLeftVar)
         ifAffectedRightValPair = MOIPProblem.loadPair(ifAffectedRightVal)
         elseAffectedLeftVarPair = MOIPProblem.loadPair(elseAffectedLeftVar)
@@ -222,6 +228,22 @@ class MOIPProblem:
         inequationsMapList.append(derivedIneql2)
         
         return inequationsMapList
+    
+    @classmethod
+    def reorderConditions(cls, conditions, varCount):
+        targetPos = 0  
+        conditions = list(map(lambda x: x.replace('>=', '='), conditions))
+        for cond in conditions:
+            parts = cond.split('=')
+            key = int(parts[0].strip())
+            if key == varCount:
+                break
+            targetPos = targetPos +1
+        'swap the targetPos and the last pos'
+        temp = conditions[targetPos]
+        conditions[targetPos] = conditions[len(conditions)-1]
+        conditions[len(conditions)-1]=temp
+        return conditions
     
     @classmethod
     def loadMap(cls, mapList):
