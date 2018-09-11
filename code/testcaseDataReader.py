@@ -52,26 +52,63 @@ class TestcaseDataReader():
         self.bigMConditionalEquationsMapList = []
         return 
     
+    def displayFeatureNum(self):
+        print ("Total feature size: ",len(self.featureNames))
+        
+    def displayTestCaseNum(self):
+        print ("Total testcase size: ",len(self.testCaseNames))
+        
+    def displayStmtNum(self):
+        print ("Total statement size: ",len(self.stmtsofTestcaseMap))
+    
+    def displayFaultNum(self):
+        print ("Total fault size: ",len(self.faultToTestcaseMap))
+    
+    def displayConstraintInequationNum(self):
+        print ("Total constrained inequations size: ",len(self.sparseInequationsMapList))
+        
+    def displayConstraintEquationNum(self):
+        print ("Total constrained equations size: ",len(self.sparseEquationsMapList))
+    
     def load(self):
         'first read all the test case names'
         self.loadRtimeFile()
         self.loadCovFile()
         self.loadFaultFile()
         
+        self.buildFeatures()
+        
         print (self.timeofTestcase)
         print (self.stmtsofTestcaseMap)
         print (self.faultToTestcaseMap)
         return 
     
+    def buildFeatures(self):
+        faultIDs = map(lambda x: int(x[1:]), self.faultToTestcaseMap.keys())
+        sortedFaultIDs = sorted(faultIDs)    
+        totalFeatures= len(self.testCaseNames) + len(sortedFaultIDs)
+        for i in range(0,totalFeatures):
+            if i < len(self.testCaseNames) :
+                key = self.testCaseNames[i]
+                self.featureNames[key] = i
+            else:
+                key = 'f'+str(sortedFaultIDs[i-len(self.testCaseNames)])
+                self.featureNames[key] = i 
+        return
+    
     def loadFaultFile(self):
         line = self.faultFile.readline()             # 调用文件的 readline()方法
         while line:
             #for testing purpose
-            print(line, end = '')
+            #print(line, end = '')
             parts = line.split(':')
             #example: t2:2 3
             testCaseName= parts[0].strip()
             faults = parts[1].split(' ')
+            'bug fixed here, for case: ["t329", "\n"]'
+            if( parts[1].strip() == '\n' or  parts[1].strip() == '' ):
+                line = self.faultFile.readline()
+                continue
             for fault in faults:
                 faultName= 'f'+fault.strip()
                 if faultName in self.faultToTestcaseMap:
@@ -97,11 +134,15 @@ class TestcaseDataReader():
         line = self.covFile.readline()             # 调用文件的 readline()方法
         while line:
             #for testing purpose
-            print(line, end = '')
+            #print(line, end = '')
             parts = line.split(':')
             #example: t2:2 3
             testCaseName= parts[0].strip()
             stmts = parts[1].split(' ')
+            if( parts[1].strip() == '\n' or  parts[1].strip() == '' ):
+                line = self.covFile.readline()
+                continue
+            
             for stmt in stmts:
                 stmtName= 's'+stmt.strip()
                 if stmtName in self.stmtsofTestcaseMap:
@@ -127,7 +168,7 @@ class TestcaseDataReader():
         line = self.rtimeFile.readline()             # 调用文件的 readline()方法
         while line:
             #for testing purpose
-            print(line, end = '')
+            #print(line, end = '')
             parts = line.split(':')
             testCaseName= parts[0].strip()
             time= float(parts[1].strip())
@@ -137,13 +178,111 @@ class TestcaseDataReader():
         self.rtimeFile.close()
         return 
     
-    def save(self,outputPath):
+    def save(self,outputPath):   
+        output = open(outputPath,'w')
+        'write objectives content'
+        output.write("objectives ==\n")
+        output.write("totalNumber; totalFault\n")
+        totalCost= []
+        totalFeatures= len(self.featureNames)
+        #example: [1.0;1.0;1.0;0.0;0.0;0.0;0.0]
+        #         [0.0;0.0;0.0;-1.0;-1.0;-1.0;-1.0]   
+        for i in range(0,totalFeatures):
+            if i < len(self.testCaseNames) :
+                 totalCost.append(self.timeofTestcase[self.testCaseNames[i]])
+            else:
+                 totalCost.append(0.0)
+        obj1String = str(totalCost).replace(',', ';')
+        output.write(obj1String+'\n')
+        totalFault =[]
+        for j in range(0,totalFeatures):
+            if j < len(self.testCaseNames) :
+                 totalFault.append(0.0)
+            else:
+                 totalFault.append(-1.0)
+        obj2String = str(totalFault).replace(',', ';')
+        output.write(obj2String+'\n')
+        output.write('\n')
         
+        'write variable content'
+        #example:{t1=0, t2=1, t3=2, g1=3, g2=4, g3=5, g4=6}
+        sortedFeatureItems= sorted(self.featureNames.items(), key = lambda k: k[1])
+        variableContStr ='{'
+        for item in sortedFeatureItems:
+            if item[1]!=totalFeatures-1:
+                variableContStr += item[0]+'='+str(item[1])+', '
+            else:
+                variableContStr += item[0]+'='+str(item[1])
+        variableContStr +='}'
+        output.write('variables ==\n')
+        output.write(variableContStr+'\n')
+        output.write('\n')
+        
+        'write inequation content for all stmts'
+        #example: [{0=-1.0, 2=-1.0, 7=-1.0},{1=-1.0, 7=-1.0},{1=-1.0, 2=-1.0, 7=-1.0}]
+        self.sparseInequationsMapList=[]
+        for stmtName in self.stmtsofTestcaseMap:
+            inequationMap = {}
+            testcaseList= self.stmtsofTestcaseMap[stmtName]
+            for testcase in testcaseList:
+                pos = self.featureNames[testcase]
+                if pos >=0 :
+                    inequationMap[pos] = -1.0
+                else:
+                    print ('input have duplicates!!!')
+                    exit(-1) 
+            inequationMap[totalFeatures]= -1.0
+            self.sparseInequationsMapList.append(inequationMap)
+        output.write('Inequations ==\n')
+        sparseInequationMapStr= str(self.sparseInequationsMapList).replace(': ', '=')
+        output.write(sparseInequationMapStr+'\n')
+        output.write('\n')
+        
+        'write the fault detection content for all faults'
+        self.sparseEquationsMapList=[]
+        for fault in self.faultToTestcaseMap:
+            #example: (if {1=1.0,2=1.0,7>=1.0}: {3=1.0, 7=1.0}; else : {3=1.0, 7=0.0})
+            conditionalEquation =''
+            conditionMap={}
+            ifCodeMap={}
+            elseCodeMap={}
+            testcaseList= self.faultToTestcaseMap[fault]
+            for testcase in testcaseList:
+                pos = self.featureNames[testcase]
+                if pos >=0 :
+                    conditionMap[pos] = 1.0
+                else:
+                    print ('input have duplicates!!!')
+                    exit(-1) 
+            conditionMap[totalFeatures]= 1.0
+            conditionMapStr= str(conditionMap).replace(': ', '=')
+            lastPos = conditionMapStr.rfind('=')
+            conditionMapStr= conditionMapStr[:lastPos] + '>' + conditionMapStr[lastPos:]
+            ifCodeMap[self.featureNames[fault]]=1.0
+            ifCodeMap[totalFeatures]=1.0
+            ifCodeMapStr= str(ifCodeMap).replace(': ', '=')
+            elseCodeMap[self.featureNames[fault]]=1.0
+            elseCodeMap[totalFeatures]=0.0
+            elseCodeMapStr= str(elseCodeMap).replace(': ', '=')
+            conditionalEquation='(if '+conditionMapStr+': '+ ifCodeMapStr+'; else : '+elseCodeMapStr+')'
+            self.sparseEquationsMapList.append(conditionalEquation)
+        conditionalEquationStrs = '['+';'.join(self.sparseEquationsMapList)+']'
+        output.write('Conditional Equation ==\n')
+        output.write(conditionalEquationStrs+'\n')
+        
+        output.close()
         return 
     
     
 if __name__ == "__main__":
-    reader = TestcaseDataReader('../../Nemo/example')
+    reader = TestcaseDataReader('../../Nemo/subject_programs/make_v5')
     reader.load()
+    reader.save('../test/input_make_bigM.txt')
+    reader.displayFeatureNum()
+    reader.displayTestCaseNum()
+    reader.displayStmtNum()
+    reader.displayFaultNum()
+    reader.displayConstraintInequationNum()
+    reader.displayConstraintEquationNum()
 else:
     print("testcaseDataReader.py is being imported into another module")

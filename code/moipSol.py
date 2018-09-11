@@ -59,9 +59,12 @@ class BaseSol:
         inputPoints = [list(map(float,resultID.split('_'))) for resultID in self.cplexResultMap.keys()]
         #debugging purpose
         #print (inputPoints)
-        paretoPoints, dominatedPoints = MOOUtility.simple_cull(inputPoints,MOOUtility.dominates)
-        #print ("Pareto size: ", len(paretoPoints), " Pareto front: ",  paretoPoints)
-        self.cplexParetoSet= paretoPoints
+        if(len(inputPoints)==0):
+            self.cplexParetoSet=[]
+        else: 
+            paretoPoints, dominatedPoints = MOOUtility.simple_cull(inputPoints,MOOUtility.dominates)
+            #print ("Pareto size: ", len(paretoPoints), " Pareto front: ",  paretoPoints)
+            self.cplexParetoSet= paretoPoints
     
     """
     model the problem as a single objective problem, and preparation solver for this
@@ -180,7 +183,14 @@ class BaseSol:
         file = open(file,"w") 
         file.write(';'.join(list(map(str,self.cplexParetoSet)))) 
         file.close() 
-        
+    
+    def outputFullCplexResultMap(self,file):
+        file = open(file,"w") 
+        for key in self.cplexResultMap.keys():
+            cplexResult = self.cplexResultMap[key]
+            file.write(key+": "+str(cplexResult.xvar)+'\n') 
+        file.close() 
+    
     def __private_testConstraints__(self):
         for i in range(self.solver.linear_constraints.get_num()):
             print (self.solver.linear_constraints.get_rows(i), self.solver.linear_constraints.get_senses(i), self.solver.linear_constraints.get_rhs(i))

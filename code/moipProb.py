@@ -163,6 +163,8 @@ class MOIPProblem:
                             self.sparseEquationsMapList.append(eqlDict)
                     elif mode == "bigM_ineql":
                         #read Inequations constraints for big M in sparse maps
+                        M = self.__private_calculteM__()
+                        print ('Big M problem, M =:'+ str(M))
                         reGroupTestStr = line 
                         bigM_ineqls = re.findall("\((.+?)\)", reGroupTestStr)
                         for ineql in bigM_ineqls: 
@@ -175,8 +177,7 @@ class MOIPProblem:
                             if_code = if_parts[1].strip()
                             else_parts = re.findall("{(.+?)}", else_branch)
                             else_code = else_parts[0].strip()
-                            conditions = (if_condition,if_code,else_code)
-                            M = self.__private_calculteM__()
+                            conditions = (if_condition,if_code,else_code)                           
                             MOIPProblem.bigMConversion(conditions, M, self.sparseInequationsMapList)
                 line = f.readline()
                 
@@ -302,10 +303,10 @@ class MOIPProblem:
         return matrix
     
 if __name__ == "__main__":
-    prob = MOIPProblem(2,7,1)  
+    prob = MOIPProblem(2,173,1)
     prob.displayObjectiveCount()
     prob.displayFeatureCount()
-    prob.exetractFromFile("../test/parameter_example_bigM.txt")
+    prob.exetractFromFile("../test/input_make_bigM.txt")
     prob.displayObjectives()
     prob.displayVariableNames()
     prob.displayObjectiveSparseMapList()
