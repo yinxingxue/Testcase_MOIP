@@ -210,10 +210,10 @@ class CwmoipSol(NaiveSol):
         return (rsltObj,rsltXvar,rsltSolString)
  
 if __name__ == "__main__":
-    prob = MOIPProblem(2,173,1)  
+    prob = MOIPProblem(2,800,1)  
     prob.displayObjectiveCount()
     prob.displayFeatureCount()
-    prob.exetractFromFile("../test/input_make_bigM.txt")
+    prob.exetractFromFile("../test/input_grep_bigM.txt")
     prob.displayObjectives()
     prob.displayVariableNames()
     prob.displayObjectiveSparseMapList()
@@ -224,8 +224,8 @@ if __name__ == "__main__":
     sol= CwmoipSol(prob)
     sol.prepare()
     sol.execute()
-    sol.outputCplexParetoMap("../result/Pareto_make_bigM.txt")
-    sol.outputFullCplexResultMap("../result/FullResult_make_bigM.txt")
+    sol.outputCplexParetoMap("../result/Pareto_grep_bigM.txt")
+    sol.outputFullCplexResultMap("../result/FullResult_grep_bigM.txt")
     sol.displaySolvingAttempts()
     sol.displayObjsBoundsDictionary()
     sol.displayCplexSolutionSetSize()

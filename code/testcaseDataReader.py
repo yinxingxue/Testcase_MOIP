@@ -275,9 +275,9 @@ class TestcaseDataReader():
     
     
 if __name__ == "__main__":
-    reader = TestcaseDataReader('../../Nemo/subject_programs/make_v5')
+    reader = TestcaseDataReader('../../Nemo/subject_programs/grep_v5')
     reader.load()
-    reader.save('../test/input_make_bigM.txt')
+    reader.save('../test/input_grep_bigM.txt')
     reader.displayFeatureNum()
     reader.displayTestCaseNum()
     reader.displayStmtNum()
