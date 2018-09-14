@@ -316,4 +316,4 @@ if __name__ == "__main__":
     reader.displayConstraintInequationNum()
     reader.displayConstraintEquationNum()
 else:
-    print("VariantBiCriteriaProbReader.py is being imported into another module")
+    print("VariantBiCriteriaProbReaderBigM.py is being imported into another module")
