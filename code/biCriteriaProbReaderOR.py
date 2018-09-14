@@ -6,7 +6,7 @@ Created on Mon Sep 10 11:48:10 2018
 """
 from collections import Counter
 
-class TestcaseDataReader():  
+class BiCriteriaProbReaderOR():  
     'the class to read the raw data of the test case data, including the test case coverage, fault information, etc.'
     
     def __init__(self,path):  
@@ -266,7 +266,7 @@ class TestcaseDataReader():
     
     
 if __name__ == "__main__":
-    reader = TestcaseDataReader('../../Nemo/subject_programs/grep_v5')
+    reader = BiCriteriaProbReaderOR('../../Nemo/subject_programs/grep_v5')
     reader.load()
     reader.save('../test/input_grep.txt')
     reader.displayFeatureNum()
@@ -276,4 +276,4 @@ if __name__ == "__main__":
     reader.displayConstraintInequationNum()
     reader.displayConstraintEquationNum()
 else:
-    print("testcaseDataReaderNew.py is being imported into another module")
+    print("biCriteriaProbReaderOR.py is being imported into another module")
