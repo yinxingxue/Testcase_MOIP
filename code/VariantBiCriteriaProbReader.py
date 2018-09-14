@@ -4,9 +4,10 @@ Created on Mon Sep 10 11:48:10 2018
 
 @author: Yinxing Xue
 """
+import math
 from collections import Counter
 
-class TestcaseDataReader():  
+class VariantBiCriteriaProbReader():  
     'the class to read the raw data of the test case data, including the test case coverage, fault information, etc.'
     
     def __init__(self,path):  
@@ -20,7 +21,9 @@ class TestcaseDataReader():
         self.testCaseNames=[]
         self.faultNames=[]
         self.timeofTestcase={}
-   
+        
+        self.topStmts = {}
+        
         """
         each list is to represent one objectives, and use the objectivesList to store all the objectives maps
         """
@@ -221,7 +224,13 @@ class TestcaseDataReader():
         'write inequation content for all stmts'
         #example: [{0=-1.0, 2=-1.0, 7=-1.0},{1=-1.0, 7=-1.0},{1=-1.0, 2=-1.0, 7=-1.0}]
         self.sparseInequationsMapList=[]
+        stmtFrequency = {}
         'find the most top 10% of statements executed most frequently'
+        for stmtName in self.stmtsofTestcaseMap:
+             size= len(self.stmtsofTestcaseMap[stmtName])
+             stmtFrequency[stmtName] = size
+        self.topStmts = VariantBiCriteriaProbReader.calculateTopStmt(stmtFrequency,0.10)
+        
         for stmtName in self.stmtsofTestcaseMap:
             inequationMap = {}
             testcaseList= self.stmtsofTestcaseMap[stmtName]
@@ -233,7 +242,10 @@ class TestcaseDataReader():
                     print ('input have duplicates!!!')
                     exit(-1) 
             'check whether it is the most top 10% of statements executed most frequently, if yes, set to ceiling() for 10% of the number of the execution times of the entire test suite'
-            inequationMap[totalFeatures]= -1.0
+            if(stmtName in  self.topStmts):
+                inequationMap[totalFeatures]= -1.0 * (math.floor(float(0.1*self.topStmts[stmtName])))
+            else :
+                inequationMap[totalFeatures]= -1.0
             self.sparseInequationsMapList.append(inequationMap)
         output.write('Inequations ==\n')
         sparseInequationMapStr= str(self.sparseInequationsMapList).replace(': ', '=')
@@ -275,11 +287,28 @@ class TestcaseDataReader():
         output.close()
         return 
     
+    @classmethod
+    def calculateTopStmt(cls, allStmtFrequency, percent):
+        topStmt = {}
+        sorted_Stmt =   sorted(allStmtFrequency, key=lambda x: allStmtFrequency[x], reverse= True)
+        totalStmtsSize = len(allStmtFrequency)
+        allowedStmtSize = math.ceil(float(percent * totalStmtsSize))
+        counter = 0 
+        miniFreq = -1
+        for stmt in sorted_Stmt:
+             counter = counter+1 
+             if(allStmtFrequency[stmt] < miniFreq):
+                 break
+             if(allowedStmtSize == counter):
+                 miniFreq= allStmtFrequency[stmt] 
+             topStmt[stmt] = allStmtFrequency[stmt]
+        #print ('top 10\% stmts and their freq: ', len(topStmt), topStmt)  
+        return topStmt
     
 if __name__ == "__main__":
-    reader = TestcaseDataReader('../../Nemo/subject_programs/grep_v5')
+    reader = VariantBiCriteriaProbReader('../../Nemo/subject_programs/grep_v5')
     reader.load()
-    reader.save('../test/input_grep_bigM.txt')
+    reader.save('../test/variant_bi_input_grep_bigM.txt')
     reader.displayFeatureNum()
     reader.displayTestCaseNum()
     reader.displayStmtNum()
@@ -287,4 +316,4 @@ if __name__ == "__main__":
     reader.displayConstraintInequationNum()
     reader.displayConstraintEquationNum()
 else:
-    print("testcaseDataReader.py is being imported into another module")
+    print("VariantBiCriteriaProbReader.py is being imported into another module")
