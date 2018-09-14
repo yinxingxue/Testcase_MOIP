@@ -285,4 +285,4 @@ if __name__ == "__main__":
     reader.displayConstraintInequationNum()
     reader.displayConstraintEquationNum()
 else:
-    print("BiCriteriaProbReaderBigM.py is being imported into another module")
+    print("biCriteriaProbReaderBigM.py is being imported into another module")

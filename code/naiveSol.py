@@ -135,10 +135,10 @@ class NaiveSol(BaseSol):
         print ("Objectives' Bound Dictionary: %s" % self.boundsDict) 
     
 if __name__ == "__main__":
-    prob = MOIPProblem(2,173,1)  
+    prob = MOIPProblem(2,800,1)  
     prob.displayObjectiveCount()
     prob.displayFeatureCount()
-    prob.exetractFromFile("../test/variant_bi_input_make_bigM.txt")
+    prob.exetractFromFile("../test/variant_bi_input_grep_OR.txt")
     prob.displayObjectives()
     prob.displayVariableNames()
     prob.displayObjectiveSparseMapList()
@@ -149,8 +149,8 @@ if __name__ == "__main__":
     sol= NaiveSol(prob)
     sol.prepare()
     sol.execute()
-    sol.outputCplexParetoMap("../result/variant_bi-obj/Pareto_variant_bi_make.txt")
-    sol.outputFullCplexResultMap("../result/variant_bi-obj/FullResult_variant_bi_make.txt")
+    sol.outputCplexParetoMap("../result/variant_bi-obj/Pareto_variant_bi_grep.txt")
+    sol.outputFullCplexResultMap("../result/variant_bi-obj/FullResult_variant_bi_grep.txt")
     sol.displaySolvingAttempts()
     sol.displayObjsBoundsDictionary()
     sol.displayCplexSolutionSetSize()

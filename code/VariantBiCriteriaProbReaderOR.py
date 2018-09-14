@@ -7,7 +7,7 @@ Created on Mon Sep 10 11:48:10 2018
 import math
 from collections import Counter
 
-class VariantBiCriteriaProbReaderBigM():  
+class VariantBiCriteriaProbReaderOR():  
     'the class to read the raw data of the test case data, including the test case coverage, fault information, etc.'
     
     def __init__(self,path):  
@@ -229,7 +229,7 @@ class VariantBiCriteriaProbReaderBigM():
         for stmtName in self.stmtsofTestcaseMap:
              size= len(self.stmtsofTestcaseMap[stmtName])
              stmtFrequency[stmtName] = size
-        self.topStmts = VariantBiCriteriaProbReaderBigM.calculateTopStmt(stmtFrequency,0.10)
+        self.topStmts = VariantBiCriteriaProbReaderOR.calculateTopStmt(stmtFrequency,0.10)
         
         for stmtName in self.stmtsofTestcaseMap:
             inequationMap = {}
@@ -297,9 +297,9 @@ class VariantBiCriteriaProbReaderBigM():
         return topStmt
     
 if __name__ == "__main__":
-    reader = VariantBiCriteriaProbReaderBigM('../../Nemo/subject_programs/grep_v5')
+    reader = VariantBiCriteriaProbReaderOR('../../Nemo/subject_programs/grep_v5')
     reader.load()
-    reader.save('../test/variant_bi_input_grep_bigM.txt')
+    reader.save('../test/variant_bi_input_grep_OR.txt')
     reader.displayFeatureNum()
     reader.displayTestCaseNum()
     reader.displayStmtNum()
@@ -307,4 +307,4 @@ if __name__ == "__main__":
     reader.displayConstraintInequationNum()
     reader.displayConstraintEquationNum()
 else:
-    print("VariantBiCriteriaProbReader.py is being imported into another module")
+    print("variantBiCriteriaProbReaderOR.py is being imported into another module")

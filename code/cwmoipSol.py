@@ -213,7 +213,7 @@ if __name__ == "__main__":
     prob = MOIPProblem(2,800,1)  
     prob.displayObjectiveCount()
     prob.displayFeatureCount()
-    prob.exetractFromFile("../test/variant_bi_input_grep_bigM.txt")
+    prob.exetractFromFile("../test/variant_bi_input_grep_OR.txt")
     prob.displayObjectives()
     prob.displayVariableNames()
     prob.displayObjectiveSparseMapList()
