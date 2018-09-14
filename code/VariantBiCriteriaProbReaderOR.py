@@ -247,43 +247,34 @@ class VariantBiCriteriaProbReaderBigM():
             else :
                 inequationMap[totalFeatures]= -1.0
             self.sparseInequationsMapList.append(inequationMap)
-        output.write('Inequations ==\n')
-        sparseInequationMapStr= str(self.sparseInequationsMapList).replace(': ', '=')
-        output.write(sparseInequationMapStr+'\n')
-        output.write('\n')
-        
+            
         'write the fault detection content for all faults'
         self.sparseEquationsMapList=[]
         for fault in self.faultToTestcaseMap:
-            #example: (if {1=1.0,2=1.0,7>=1.0}: {3=1.0, 7=1.0}; else : {3=1.0, 7=0.0})
-            conditionalEquation =''
-            conditionMap={}
-            ifCodeMap={}
-            elseCodeMap={}
+            totalEquationMap = {}
+            faultPos = self.featureNames[fault]
+            if faultPos < 0 :
+                 print ('input have duplicates!!!')
+                 exit(-1) 
+            totalEquationMap[faultPos] = 1.0
             testcaseList= self.faultToTestcaseMap[fault]
             for testcase in testcaseList:
+                tempInequationMap={}
                 pos = self.featureNames[testcase]
-                if pos >=0 :
-                    conditionMap[pos] = 1.0
-                else:
+                if pos < 0 :
                     print ('input have duplicates!!!')
                     exit(-1) 
-            conditionMap[totalFeatures]= 1.0
-            conditionMapStr= str(conditionMap).replace(': ', '=')
-            lastPos = conditionMapStr.rfind('=')
-            conditionMapStr= conditionMapStr[:lastPos] + '>' + conditionMapStr[lastPos:]
-            ifCodeMap[self.featureNames[fault]]=1.0
-            ifCodeMap[totalFeatures]=1.0
-            ifCodeMapStr= str(ifCodeMap).replace(': ', '=')
-            elseCodeMap[self.featureNames[fault]]=1.0
-            elseCodeMap[totalFeatures]=0.0
-            elseCodeMapStr= str(elseCodeMap).replace(': ', '=')
-            conditionalEquation='(if '+conditionMapStr+': '+ ifCodeMapStr+'; else : '+elseCodeMapStr+')'
-            self.sparseEquationsMapList.append(conditionalEquation)
-        conditionalEquationStrs = '['+';'.join(self.sparseEquationsMapList)+']'
-        output.write('Conditional Equation ==\n')
-        output.write(conditionalEquationStrs+'\n')
-        
+                tempInequationMap[pos] = 1.0
+                tempInequationMap[faultPos] = -1.0
+                tempInequationMap[totalFeatures]= 0.0
+                self.sparseInequationsMapList.append(tempInequationMap)
+                'also set the Or relation'
+                totalEquationMap[pos] = -1.0
+            totalEquationMap[totalFeatures] = 0.0
+            self.sparseInequationsMapList.append(totalEquationMap)
+        output.write('Inequations ==\n')
+        sparseInequationMapStr= str(self.sparseInequationsMapList).replace(': ', '=')
+        output.write(sparseInequationMapStr+'\n')
         output.close()
         return 
     
