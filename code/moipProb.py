@@ -5,6 +5,7 @@ Created on Mon Jun 11 11:30:04 2018
 @author: Yinxing Xue
 """
 import re
+import math
 
 class MOIPProblem:
     'define the problem of a MOBIP'
@@ -298,12 +299,19 @@ class MOIPProblem:
         self.attributeMatrix[targetPos] = temp
     
     def __private_calculteM__(self):
-        M_obj = self.objectNames.index('totalNumber')
-        if M_obj == -1: 
-            M_obj= 0
-        M = sum(self.objectiveSparseMapList[M_obj].values())+1
-        return M
-        
+        if 'totalNumber'  in self.objectNames:
+            M_obj = self.objectNames.index('totalNumber')
+            if M_obj == -1: 
+                M_obj= 0
+            M = sum(self.objectiveSparseMapList[M_obj].values())+1
+            return M
+        else:
+            summation = 0
+            for obj in self.objectiveSparseMapList:
+                summation = summation + math.fabs(sum(obj.values()))
+            M= len(self.featureNames)- summation +1
+            return M
+            
     def __private_calculteUBLB__(self,obj):
         ub = 0.0
         lb = 0.0

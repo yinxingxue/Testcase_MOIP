@@ -5,9 +5,11 @@ Created on Mon Sep 10 11:48:10 2018
 @author: Yinxing Xue
 """
 from collections import Counter
+import math
 
-class BiCriteriaProbReaderBigM():  
+class TriCriteriaProbReaderBigM():  
     'the class to read the raw data of the test case data, including the test case coverage, fault information, etc.'
+    AllowPerc = 0.05
     
     def __init__(self,path):  
         self.covFile = open(path+"/cov.info", "r")
@@ -84,15 +86,21 @@ class BiCriteriaProbReaderBigM():
         return 
     
     def buildFeatures(self):
+        'the first part is test case, the second part is stmt, the third part is fault'
         faultIDs = map(lambda x: int(x[1:]), self.faultToTestcaseMap.keys())
-        sortedFaultIDs = sorted(faultIDs)    
-        totalFeatures= len(self.testCaseNames) + len(sortedFaultIDs)
+        sortedFaultIDs = sorted(faultIDs)
+        stmtIDs = map(lambda x: int(x[1:]), self.stmtsofTestcaseMap.keys())
+        sortStmtIDs = sorted(stmtIDs)
+        totalFeatures= len(self.testCaseNames) + len(sortStmtIDs)+ len(sortedFaultIDs)
         for i in range(0,totalFeatures):
             if i < len(self.testCaseNames) :
                 key = self.testCaseNames[i]
                 self.featureNames[key] = i
+            elif i >= len(self.testCaseNames) and i<  len(self.testCaseNames) + len(sortStmtIDs):
+                key = 's'+str(sortStmtIDs[i-len(self.testCaseNames)])
+                self.featureNames[key] = i
             else:
-                key = 'f'+str(sortedFaultIDs[i-len(self.testCaseNames)])
+                key = 'f'+str(sortedFaultIDs[i-len(self.testCaseNames)-len(sortStmtIDs)])
                 self.featureNames[key] = i 
         return
     
@@ -182,21 +190,25 @@ class BiCriteriaProbReaderBigM():
         output = open(outputPath,'w')
         'write objectives content'
         output.write("objectives ==\n")
-        output.write("totalNumber; totalFault\n")
-        totalCost= []
+        output.write("totalStmt; totalFault\n")
+        totalStmt= []
         totalFeatures= len(self.featureNames)
         #example: [1.0;1.0;1.0;0.0;0.0;0.0;0.0]
         #         [0.0;0.0;0.0;-1.0;-1.0;-1.0;-1.0]   
         for i in range(0,totalFeatures):
             if i < len(self.testCaseNames) :
-                 totalCost.append(self.timeofTestcase[self.testCaseNames[i]])
+                 totalStmt.append(0.0)
+            elif i >= len(self.testCaseNames) and i<  len(self.testCaseNames) + len(self.stmtsofTestcaseMap): 
+                 totalStmt.append(-1.0)
             else:
-                 totalCost.append(0.0)
-        obj1String = str(totalCost).replace(',', ';')
+                 totalStmt.append(0.0)
+        obj1String = str(totalStmt).replace(',', ';')
         output.write(obj1String+'\n')
         totalFault =[]
         for j in range(0,totalFeatures):
             if j < len(self.testCaseNames) :
+                 totalFault.append(0.0)
+            elif j >= len(self.testCaseNames) and j<  len(self.testCaseNames) + len(self.stmtsofTestcaseMap): 
                  totalFault.append(0.0)
             else:
                  totalFault.append(-1.0)
@@ -219,27 +231,40 @@ class BiCriteriaProbReaderBigM():
         output.write('\n')
         
         'write inequation content for all stmts'
-        #example: [{0=-1.0, 2=-1.0, 7=-1.0},{1=-1.0, 7=-1.0},{1=-1.0, 2=-1.0, 7=-1.0}]
+        #example: 
         self.sparseInequationsMapList=[]
         for stmtName in self.stmtsofTestcaseMap:
-            inequationMap = {}
+            #example: 
+            conditionalEquation =''
+            conditionMap={}
+            ifCodeMap={}
+            elseCodeMap={}
             testcaseList= self.stmtsofTestcaseMap[stmtName]
             for testcase in testcaseList:
                 pos = self.featureNames[testcase]
                 if pos >=0 :
-                    inequationMap[pos] = -1.0
+                    conditionMap[pos] = 1.0
                 else:
                     print ('input have duplicates!!!')
                     exit(-1) 
-            inequationMap[totalFeatures]= -1.0
-            self.sparseInequationsMapList.append(inequationMap)
-        output.write('Inequations ==\n')
-        sparseInequationMapStr= str(self.sparseInequationsMapList).replace(': ', '=')
-        output.write(sparseInequationMapStr+'\n')
-        output.write('\n')
+            conditionMap[totalFeatures]= 1.0
+            conditionMapStr= str(conditionMap).replace(': ', '=')
+            lastPos = conditionMapStr.rfind('=')
+            conditionMapStr= conditionMapStr[:lastPos] + '>' + conditionMapStr[lastPos:]
+            ifCodeMap[self.featureNames[stmtName]]=1.0
+            ifCodeMap[totalFeatures]=1.0
+            ifCodeMapStr= str(ifCodeMap).replace(': ', '=')
+            elseCodeMap[self.featureNames[stmtName]]=1.0
+            elseCodeMap[totalFeatures]=0.0
+            elseCodeMapStr= str(elseCodeMap).replace(': ', '=')
+            conditionalEquation='(if '+conditionMapStr+': '+ ifCodeMapStr+'; else : '+elseCodeMapStr+')'
+            self.sparseInequationsMapList.append(conditionalEquation)
+        
+        #sparseInequationMapStr= str(self.sparseInequationsMapList).replace(': ', '=')
+        #output.write(sparseInequationMapStr+'\n')
+        #output.write('\n')
         
         'write the fault detection content for all faults'
-        self.sparseEquationsMapList=[]
         for fault in self.faultToTestcaseMap:
             #example: (if {1=1.0,2=1.0,7>=1.0}: {3=1.0, 7=1.0}; else : {3=1.0, 7=0.0})
             conditionalEquation =''
@@ -265,19 +290,34 @@ class BiCriteriaProbReaderBigM():
             elseCodeMap[totalFeatures]=0.0
             elseCodeMapStr= str(elseCodeMap).replace(': ', '=')
             conditionalEquation='(if '+conditionMapStr+': '+ ifCodeMapStr+'; else : '+elseCodeMapStr+')'
-            self.sparseEquationsMapList.append(conditionalEquation)
-        conditionalEquationStrs = '['+';'.join(self.sparseEquationsMapList)+']'
+            self.sparseInequationsMapList.append(conditionalEquation)
+        conditionalEquationStrs = '['+';'.join(self.sparseInequationsMapList)+']'
         output.write('Conditional Equation ==\n')
         output.write(conditionalEquationStrs+'\n')
+        output.write('\n')
         
+        self.sparseEquationsMapList=[]
+        'the constraint of the fixed percent of total cost'
+        sparseEquation= {}
+        for i in range(0,len(self.testCaseNames)):
+            if i < len(self.testCaseNames) :
+                  sparseEquation[self.featureNames[self.testCaseNames[i]]] = (self.timeofTestcase[self.testCaseNames[i]])
+        totalCost = sum(self.timeofTestcase.values())
+        allowCost = int(math.floor(totalCost * TriCriteriaProbReaderBigM.AllowPerc+0.5))
+        sparseEquation[totalFeatures] = allowCost
+        self.sparseEquationsMapList.append(sparseEquation)
+        output.write('Equations ==\n')
+        sparseEquationMapStr= str(self.sparseEquationsMapList).replace(': ', '=')
+        output.write(sparseEquationMapStr+'\n')
         output.close()
         return 
     
     
 if __name__ == "__main__":
-    reader = BiCriteriaProbReaderBigM('../../Nemo/subject_programs/grep_v5')
+    reader = TriCriteriaProbReaderBigM('../../Nemo/subject_programs/make_v5')
+    #reader = TriCriteriaProbReaderBigM('../../Nemo/example')
     reader.load()
-    reader.save('../test/input_grep_bigM.txt')
+    reader.save('../test/tri_input_make_bigM.txt')
     reader.displayFeatureNum()
     reader.displayTestCaseNum()
     reader.displayStmtNum()
@@ -285,4 +325,4 @@ if __name__ == "__main__":
     reader.displayConstraintInequationNum()
     reader.displayConstraintEquationNum()
 else:
-    print("biCriteriaProbReaderBigM.py is being imported into another module")
+    print("triCriteriaProbReaderBigM.py is being imported into another module")
