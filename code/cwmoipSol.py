@@ -212,7 +212,7 @@ class CwmoipSol(NaiveSol):
  
 if __name__ == "__main__":
     problemGoalNum ='tri'
-    projectName = 'make'
+    projectName = 'grep'
     modelingMode = 'bigM'
     inputPath = '../../Nemo/subject_programs/{name}_v5'.format(name=projectName)
     moipInputFile = '../test/{goalNum}_input_{name}_{mode}.txt'.format(goalNum=problemGoalNum, name=projectName,mode=modelingMode)
@@ -252,6 +252,8 @@ if __name__ == "__main__":
     sol.displayCplexResultMap()
     sol.displayFullCplexResultMap()
     sol.displayCplexParetoSet()
+    
+    reader.verify(sol.cplexResultMap)
     #sol.displayVariableLowerBound()
     #sol.displayVariableUpperBound()
     #sol.displayVariableTypes()

@@ -6,8 +6,9 @@ Created on Mon Sep 10 11:48:10 2018
 """
 from collections import Counter
 import math
+from verifier import TestcaseVerifier
 
-class TriCriteriaProbReaderBigM():  
+class TriCriteriaProbReaderBigM(TestcaseVerifier):  
     'the class to read the raw data of the test case data, including the test case coverage, fault information, etc.'
     AllowPerc = 0.05
     
@@ -313,6 +314,50 @@ class TriCriteriaProbReaderBigM():
         output.close()
         return 
     
+    def verify(self,cplexResultMap):
+        testToStmts = {}
+        for stmt in self.stmtsofTestcaseMap: 
+            testList=  self.stmtsofTestcaseMap[stmt]
+            for test in testList:
+                #if already has this set
+                if test in testToStmts:
+                    stmtSet = testToStmts[test]
+                    stmtSet.add(stmt)
+                else:
+                    newStmtSet = set() 
+                    newStmtSet.add(stmt)
+                    testToStmts[test]= newStmtSet
+                
+        testToFaults = {}
+        for fault in self.faultToTestcaseMap: 
+            testList=  self.faultToTestcaseMap[fault]
+            for test in testList:
+                #if already has this set
+                if test in testToFaults:
+                    falutSet = testToFaults[test]
+                    falutSet.add(fault)
+                else:
+                    newFaultSet = set() 
+                    newFaultSet.add(fault)
+                    testToFaults[test]= newFaultSet
+                    
+        for key in cplexResultMap.keys():
+            coveredStmtSet = set() 
+            coveredFaultSet = set() 
+            cplexResult = cplexResultMap[key]
+            testCaseSelected= cplexResult.xvar[0:len(self.testCaseNames)]
+            for i in range(0,len(self.testCaseNames)):
+                if testCaseSelected[i] == 0.0 or testCaseSelected[i] < 0.00000001:
+                    continue
+                testCaseName = self.testCaseNames[i]
+                coveredStmtSet.update(testToStmts[testCaseName])
+                'bug fixed here, need to add the if in check, because it is not necessary that each test will find some fault'
+                if testCaseName in testToFaults:
+                    coveredFaultSet.update(testToFaults[testCaseName])
+            coveredStmtSetPerc = 1.0 * len(coveredStmtSet) / len(self.stmtsofTestcaseMap) 
+            coveredFaultSetPerc = 1.0 * len(coveredFaultSet) / len(self.faultToTestcaseMap) 
+            print ("Pareto Value: "+ key + " StmtCoverage: " + str(coveredStmtSetPerc) + " FaultCoverage: "+ str(coveredFaultSetPerc))
+        return
     
 if __name__ == "__main__":
     reader = TriCriteriaProbReaderBigM('../../Nemo/subject_programs/make_v5')
