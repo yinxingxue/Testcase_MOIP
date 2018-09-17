@@ -12,6 +12,7 @@ from naiveSol import NaiveSol
 from moipSol import CplexSolResult
 from mooUtility import MOOUtility 
 from decimal import Decimal
+from triCriteriaProbReaderBigM import TriCriteriaProbReaderBigM
 
 class CwmoipSol(NaiveSol):  
     'define the CWMOIP solution of a MOBIP'
@@ -210,10 +211,29 @@ class CwmoipSol(NaiveSol):
         return (rsltObj,rsltXvar,rsltSolString)
  
 if __name__ == "__main__":
-    prob = MOIPProblem(2,3976,1)  
+    problemGoalNum ='tri'
+    projectName = 'make'
+    modelingMode = 'bigM'
+    inputPath = '../../Nemo/subject_programs/{name}_v5'.format(name=projectName)
+    moipInputFile = '../test/{goalNum}_input_{name}_{mode}.txt'.format(goalNum=problemGoalNum, name=projectName,mode=modelingMode)
+    paretoOutputFile = '../result/{goalNum}-obj/Pareto_{goalNum}_{name}_{mode}.txt'.format(goalNum=problemGoalNum, name=projectName,mode=modelingMode)
+    fullResultOutputFile = '../result/{goalNum}-obj/FullResult_{goalNum}_{name}_{mode}.txt'.format(goalNum=problemGoalNum, name=projectName,mode=modelingMode)
+    
+    reader = TriCriteriaProbReaderBigM(inputPath)
+    #reader = TriCriteriaProbReaderBigM('../../Nemo/example')
+    reader.load()
+    reader.save(moipInputFile)
+    reader.displayFeatureNum()
+    reader.displayTestCaseNum()
+    reader.displayStmtNum()
+    reader.displayFaultNum()
+    reader.displayConstraintInequationNum()
+    reader.displayConstraintEquationNum()
+    
+    prob = MOIPProblem(len(reader.objectNames),len(reader.featureNames),len(reader.objectNames)-1)  
     prob.displayObjectiveCount()
     prob.displayFeatureCount()
-    prob.exetractFromFile("../test/tri_input_make_bigM.txt")
+    prob.exetractFromFile(moipInputFile)
     prob.displayObjectives()
     prob.displayVariableNames()
     prob.displayObjectiveSparseMapList()
@@ -224,8 +244,8 @@ if __name__ == "__main__":
     sol= CwmoipSol(prob)
     sol.prepare()
     sol.execute()
-    sol.outputCplexParetoMap("../result/tri-obj/Pareto_tri_make_bigM.txt")
-    sol.outputFullCplexResultMap("../result/tri-obj/FullResult_tri_make_bigM.txt")
+    sol.outputCplexParetoMap(paretoOutputFile)
+    sol.outputFullCplexResultMap(fullResultOutputFile)
     sol.displaySolvingAttempts()
     sol.displayObjsBoundsDictionary()
     sol.displayCplexSolutionSetSize()

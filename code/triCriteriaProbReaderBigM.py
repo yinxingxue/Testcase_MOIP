@@ -16,7 +16,7 @@ class TriCriteriaProbReaderBigM():
         self.faultFile = open(path+"/fault.info", "r")
         self.rtimeFile = open(path+"/rtime.info", "r")
         
-        self.objectNames = {}
+        self.objectNames = {'totalStmt','totalFault'}
         self.featureNames = {}
         
         self.testCaseNames=[]
@@ -190,7 +190,8 @@ class TriCriteriaProbReaderBigM():
         output = open(outputPath,'w')
         'write objectives content'
         output.write("objectives ==\n")
-        output.write("totalStmt; totalFault\n")
+        objNamesStr = ';'.join(self.objectNames)
+        output.write(objNamesStr+'\n')
         totalStmt= []
         totalFeatures= len(self.featureNames)
         #example: [1.0;1.0;1.0;0.0;0.0;0.0;0.0]
