@@ -11,7 +11,7 @@ import time
 import numpy as np
 from moipProb import MOIPProblem 
 from biCriteriaProbReaderBigM import BiCriteriaProbReaderBigM
-from naiveSol import NaiveSol
+from cwmoipSol import CwmoipSol
 
 if __name__ == "__main__":
     if len(sys.argv)!=2: 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     #prob.displayAttributeMatrix()
     
     time_start=time.time()
-    sol= NaiveSol(prob)
+    sol= CwmoipSol(prob)
     sol.prepare()
     sol.execute()
     time_end=time.time()
@@ -66,4 +66,4 @@ if __name__ == "__main__":
     #sol.displayVariableTypes()
     #sol.displayVariableNames()
 else:
-    print("RQ1Config1.py is being imported into another module")
+    print("RQ1Config2.py is being imported into another module")

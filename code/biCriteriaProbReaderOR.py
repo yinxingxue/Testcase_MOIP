@@ -14,7 +14,7 @@ class BiCriteriaProbReaderOR():
         self.faultFile = open(path+"/fault.info", "r")
         self.rtimeFile = open(path+"/rtime.info", "r")
         
-        self.objectNames = {}
+        self.objectNames = {'totalNumber','totalFault'}
         self.featureNames = {}
         
         self.testCaseNames=[]
@@ -78,9 +78,9 @@ class BiCriteriaProbReaderOR():
         
         self.buildFeatures()
         
-        print (self.timeofTestcase)
-        print (self.stmtsofTestcaseMap)
-        print (self.faultToTestcaseMap)
+        #print (self.timeofTestcase)
+        #print (self.stmtsofTestcaseMap)
+        #print (self.faultToTestcaseMap)
         return 
     
     def buildFeatures(self):
@@ -182,7 +182,8 @@ class BiCriteriaProbReaderOR():
         output = open(outputPath,'w')
         'write objectives content'
         output.write("objectives ==\n")
-        output.write("totalNumber; totalFault\n")
+        objNamesStr = ';'.join(self.objectNames)
+        output.write(objNamesStr+'\n')
         totalCost= []
         totalFeatures= len(self.featureNames)
         #example: [1.0;1.0;1.0;0.0;0.0;0.0;0.0]
