@@ -83,9 +83,9 @@ class VariantBiCriteriaProbReaderBigM():
         
         self.buildFeatures()
         
-        print (self.timeofTestcase)
-        print (self.stmtsofTestcaseMap)
-        print (self.faultToTestcaseMap)
+        #print (self.timeofTestcase)
+        #print (self.stmtsofTestcaseMap)
+        #print (self.faultToTestcaseMap)
         return 
     
     def buildFeatures(self):

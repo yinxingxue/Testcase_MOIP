@@ -63,6 +63,12 @@ class MOIPProblem:
     def displaySparseEquationsMapList(self):
         print ("Equality constraints in sparse map: %s" % self.sparseEquationsMapList)
         
+    def displaySparseInequationsMapListCount(self):
+        print ("Total Inequality constraints Num in sparse map: %s" % len(self.sparseInequationsMapList))
+        
+    def displaySparseEquationsMapListCount(self):
+        print ("Total Equality constraints Num in sparse map: %s" % len(self.sparseEquationsMapList))
+        
     def displayAttributeMatrix(self):
         print ("Attribute objs in matrix: %s" % self.attributeMatrix)     
         

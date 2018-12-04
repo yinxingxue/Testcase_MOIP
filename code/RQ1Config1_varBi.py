@@ -41,8 +41,8 @@ if __name__ == "__main__":
     prob.displayObjectives()
     #prob.displayVariableNames()
     #prob.displayObjectiveSparseMapList()
-    #prob.displaySparseInequationsMapList()
-    #prob.displaySparseEquationsMapList()
+    prob.displaySparseInequationsMapListCount()
+    prob.displaySparseEquationsMapListCount()
     #prob.displayAttributeMatrix()
     
     time_start=time.time()
