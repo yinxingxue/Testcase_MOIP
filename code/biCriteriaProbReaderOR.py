@@ -14,7 +14,11 @@ class BiCriteriaProbReaderOR():
         self.faultFile = open(path+"/fault.info", "r")
         self.rtimeFile = open(path+"/rtime.info", "r")
         
-        self.objectNames = {'totalNumber','totalFault'}
+        #bug fixed here.
+        #self.objectNames = {'totalNumber','totalFault'}
+        self.objectNames =[]
+        self.objectNames.append('totalNumber')
+        self.objectNames.append('totalFault')
         self.featureNames = {}
         
         self.testCaseNames=[]
