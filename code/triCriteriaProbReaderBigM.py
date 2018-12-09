@@ -17,7 +17,10 @@ class TriCriteriaProbReaderBigM(TestcaseVerifier):
         self.faultFile = open(path+"/fault.info", "r")
         self.rtimeFile = open(path+"/rtime.info", "r")
         
-        self.objectNames = {'totalStmt','totalFault'}
+        #self.objectNames = {'totalStmt','totalFault'}
+        self.objectNames =[]
+        self.objectNames.append('totalStmt')
+        self.objectNames.append('totalFault')
         self.featureNames = {}
         
         self.testCaseNames=[]
@@ -81,9 +84,9 @@ class TriCriteriaProbReaderBigM(TestcaseVerifier):
         
         self.buildFeatures()
         
-        print (self.timeofTestcase)
-        print (self.stmtsofTestcaseMap)
-        print (self.faultToTestcaseMap)
+        #print (self.timeofTestcase)
+        #print (self.stmtsofTestcaseMap)
+        #print (self.faultToTestcaseMap)
         return 
     
     def buildFeatures(self):

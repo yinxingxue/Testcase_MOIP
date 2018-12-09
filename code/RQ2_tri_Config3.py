@@ -9,23 +9,23 @@ import os
 import sys
 import time
 from moipProb import MOIPProblem 
-from triCriteriaProbReaderBigM import TriCriteriaProbReaderBigM
-from cwmoipSol import CwmoipSol
+from triCriteriaProbReaderOR import TriCriteriaProbReaderOR
+from naiveSol import NaiveSol
 
 if __name__ == "__main__":
     if len(sys.argv)!=3: 
         os._exit(0) 
     para = sys.argv[1]
-    TriCriteriaProbReaderBigM.AllowPerc=float(sys.argv[2])
+    TriCriteriaProbReaderOR.AllowPerc=float(sys.argv[2])
     problemGoalNum ='tri'
     projectName = para
-    modelingMode = 'bigM'
+    modelingMode = 'OR'
     inputPath = '../../Nemo/subject_programs/{name}_v5'.format(name=projectName)
     moipInputFile = '../test/{goalNum}_input_{name}_{mode}.txt'.format(goalNum=problemGoalNum, name=projectName,mode=modelingMode)
     paretoOutputFile = '../result/{goalNum}-obj/Pareto_{goalNum}_{name}_{mode}.txt'.format(goalNum=problemGoalNum, name=projectName,mode=modelingMode)
     fullResultOutputFile = '../result/{goalNum}-obj/FullResult_{goalNum}_{name}_{mode}.txt'.format(goalNum=problemGoalNum, name=projectName,mode=modelingMode)
     
-    reader = TriCriteriaProbReaderBigM(inputPath)
+    reader = TriCriteriaProbReaderOR(inputPath)
     reader.load()
     reader.save(moipInputFile)
     reader.displayFeatureNum()
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     #prob.displayAttributeMatrix()
     
     time_start=time.time()
-    sol= CwmoipSol(prob)
+    sol= NaiveSol(prob)
     sol.prepare()
     sol.execute()
     time_end=time.time()
@@ -66,4 +66,4 @@ if __name__ == "__main__":
     #sol.displayVariableTypes()
     #sol.displayVariableNames()
 else:
-    print("triCriteriaProbReaderBigM.py is being imported into another module")
+    print("triCriteriaProbReaderOR.py is being imported into another module")

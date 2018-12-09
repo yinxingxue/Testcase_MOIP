@@ -17,7 +17,10 @@ class TriCriteriaProbReaderOR(TestcaseVerifier):
         self.faultFile = open(path+"/fault.info", "r")
         self.rtimeFile = open(path+"/rtime.info", "r")
         
-        self.objectNames = {'totalStmt','totalFault'}
+        #self.objectNames = {'totalStmt','totalFault'}
+        self.objectNames =[]
+        self.objectNames.append('totalStmt')
+        self.objectNames.append('totalFault')
         self.featureNames = {}
         
         self.testCaseNames=[]
@@ -81,9 +84,9 @@ class TriCriteriaProbReaderOR(TestcaseVerifier):
         
         self.buildFeatures()
         
-        print (self.timeofTestcase)
-        print (self.stmtsofTestcaseMap)
-        print (self.faultToTestcaseMap)
+        #print (self.timeofTestcase)
+        #print (self.stmtsofTestcaseMap)
+        #print (self.faultToTestcaseMap)
         return 
     
     def buildFeatures(self):
@@ -267,36 +270,32 @@ class TriCriteriaProbReaderOR(TestcaseVerifier):
         #output.write('\n')
         
         'write the fault detection content for all faults'
+        self.sparseEquationsMapList=[]
         for fault in self.faultToTestcaseMap:
-            #example: (if {1=1.0,2=1.0,7>=1.0}: {3=1.0, 7=1.0}; else : {3=1.0, 7=0.0})
-            conditionalEquation =''
-            conditionMap={}
-            ifCodeMap={}
-            elseCodeMap={}
+            totalEquationMap = {}
+            faultPos = self.featureNames[fault]
+            if faultPos < 0 :
+                 print ('input have duplicates!!!')
+                 exit(-1) 
+            totalEquationMap[faultPos] = 1.0
             testcaseList= self.faultToTestcaseMap[fault]
             for testcase in testcaseList:
+                tempInequationMap={}
                 pos = self.featureNames[testcase]
-                if pos >=0 :
-                    conditionMap[pos] = 1.0
-                else:
+                if pos < 0 :
                     print ('input have duplicates!!!')
                     exit(-1) 
-            conditionMap[totalFeatures]= 1.0
-            conditionMapStr= str(conditionMap).replace(': ', '=')
-            lastPos = conditionMapStr.rfind('=')
-            conditionMapStr= conditionMapStr[:lastPos] + '>' + conditionMapStr[lastPos:]
-            ifCodeMap[self.featureNames[fault]]=1.0
-            ifCodeMap[totalFeatures]=1.0
-            ifCodeMapStr= str(ifCodeMap).replace(': ', '=')
-            elseCodeMap[self.featureNames[fault]]=1.0
-            elseCodeMap[totalFeatures]=0.0
-            elseCodeMapStr= str(elseCodeMap).replace(': ', '=')
-            conditionalEquation='(if '+conditionMapStr+': '+ ifCodeMapStr+'; else : '+elseCodeMapStr+')'
-            self.sparseInequationsMapList.append(conditionalEquation)
-        conditionalEquationStrs = '['+';'.join(self.sparseInequationsMapList)+']'
-        output.write('Conditional Equation ==\n')
-        output.write(conditionalEquationStrs+'\n')
-        output.write('\n')
+                tempInequationMap[pos] = 1.0
+                tempInequationMap[faultPos] = -1.0
+                tempInequationMap[totalFeatures]= 0.0
+                self.sparseInequationsMapList.append(tempInequationMap)
+                'also set the Or relation'
+                totalEquationMap[pos] = -1.0
+            totalEquationMap[totalFeatures] = 0.0
+            self.sparseInequationsMapList.append(totalEquationMap)
+        output.write('Inequations ==\n')
+        sparseInequationMapStr= str(self.sparseInequationsMapList).replace(': ', '=')
+        output.write(sparseInequationMapStr+'\n')
         
         self.sparseEquationsMapList=[]
         'the constraint of the fixed percent of total cost'
@@ -305,7 +304,7 @@ class TriCriteriaProbReaderOR(TestcaseVerifier):
             if i < len(self.testCaseNames) :
                   sparseEquation[self.featureNames[self.testCaseNames[i]]] = (self.timeofTestcase[self.testCaseNames[i]])
         totalCost = sum(self.timeofTestcase.values())
-        allowCost = int(math.floor(totalCost * TriCriteriaProbReaderBigM.AllowPerc+0.5))
+        allowCost = int(math.floor(totalCost * TriCriteriaProbReaderOR.AllowPerc+0.5))
         sparseEquation[totalFeatures] = allowCost
         self.sparseEquationsMapList.append(sparseEquation)
         output.write('Equations ==\n')
@@ -363,7 +362,7 @@ if __name__ == "__main__":
     reader = TriCriteriaProbReaderOR('../../Nemo/subject_programs/make_v5')
     #reader = TriCriteriaProbReaderBigM('../../Nemo/example')
     reader.load()
-    reader.save('../test/tri_input_make_bigM.txt')
+    reader.save('../test/tri_input_make_OR.txt')
     reader.displayFeatureNum()
     reader.displayTestCaseNum()
     reader.displayStmtNum()
