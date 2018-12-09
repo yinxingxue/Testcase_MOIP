@@ -240,37 +240,33 @@ class TriCriteriaProbReaderOR(TestcaseVerifier):
         self.sparseInequationsMapList=[]
         for stmtName in self.stmtsofTestcaseMap:
             #example: 
-            conditionalEquation =''
-            conditionMap={}
-            ifCodeMap={}
-            elseCodeMap={}
+            totalEquationMap = {}
+            stmtPos = self.featureNames[stmtName]
+            if stmtPos < 0 :
+                 print ('input have duplicates!!!')
+                 exit(-1) 
+            totalEquationMap[stmtPos] = 1.0
             testcaseList= self.stmtsofTestcaseMap[stmtName]
             for testcase in testcaseList:
+                tempInequationMap={}
                 pos = self.featureNames[testcase]
-                if pos >=0 :
-                    conditionMap[pos] = 1.0
-                else:
+                if pos < 0 :
                     print ('input have duplicates!!!')
                     exit(-1) 
-            conditionMap[totalFeatures]= 1.0
-            conditionMapStr= str(conditionMap).replace(': ', '=')
-            lastPos = conditionMapStr.rfind('=')
-            conditionMapStr= conditionMapStr[:lastPos] + '>' + conditionMapStr[lastPos:]
-            ifCodeMap[self.featureNames[stmtName]]=1.0
-            ifCodeMap[totalFeatures]=1.0
-            ifCodeMapStr= str(ifCodeMap).replace(': ', '=')
-            elseCodeMap[self.featureNames[stmtName]]=1.0
-            elseCodeMap[totalFeatures]=0.0
-            elseCodeMapStr= str(elseCodeMap).replace(': ', '=')
-            conditionalEquation='(if '+conditionMapStr+': '+ ifCodeMapStr+'; else : '+elseCodeMapStr+')'
-            self.sparseInequationsMapList.append(conditionalEquation)
+                tempInequationMap[pos] = 1.0
+                tempInequationMap[stmtPos] = -1.0
+                tempInequationMap[totalFeatures]= 0.0
+                self.sparseInequationsMapList.append(tempInequationMap)
+                'also set the Or relation'
+                totalEquationMap[pos] = -1.0
+            totalEquationMap[totalFeatures] = 0.0
+            self.sparseInequationsMapList.append(totalEquationMap)
         
         #sparseInequationMapStr= str(self.sparseInequationsMapList).replace(': ', '=')
         #output.write(sparseInequationMapStr+'\n')
         #output.write('\n')
         
         'write the fault detection content for all faults'
-        self.sparseEquationsMapList=[]
         for fault in self.faultToTestcaseMap:
             totalEquationMap = {}
             faultPos = self.featureNames[fault]

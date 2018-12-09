@@ -254,7 +254,6 @@ class VariantBiCriteriaProbReaderOR():
             self.sparseInequationsMapList.append(inequationMap)
             
         'write the fault detection content for all faults'
-        self.sparseEquationsMapList=[]
         for fault in self.faultToTestcaseMap:
             totalEquationMap = {}
             faultPos = self.featureNames[fault]
