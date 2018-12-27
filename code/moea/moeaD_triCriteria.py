@@ -8,7 +8,7 @@ import pygmo as pg
 from probReader import ProbReader
 import numpy as np
    
-class NSGA2_triCriteria:
+class MOEAD_triCriteria:
     
     AllowPerc = 0.05
     
@@ -21,26 +21,27 @@ class NSGA2_triCriteria:
         
     # Define objectives
     def fitness(self, x):
-        f_stmtNum = 10000
-        f_faultNum = 10000
-        f_testNum = 10000
+        f_stmtNum = 0
+        f_faultNum = 0
+        f_testNum = 0
         
         coveredStmtSet = set() 
         coveredFaultSet = set() 
        
         for i in range(0,ProbReader.testSuiteSize):
-            if x[i] == 0.0 or x[i] < 0.00000001:
+            if x[i] == 0.0 or x[i] < 0.5:
                 continue
+            
             testCaseName = ProbReader.testCaseNameList[i]
             coveredStmtSet.update(ProbReader.testToStmtcaseMap[testCaseName])
             'bug fixed here, need to add the if in check, because it is not necessary that each test will find some fault'
             coveredFaultSet.update(ProbReader.testToFaultcaseMap[testCaseName])
         coveredStmtSetPerc =   len(coveredStmtSet) #/ ProbReader.stmtSetSize
         coveredFaultSetPerc =  len(coveredFaultSet) #/ ProbReader.fauktSetSize
-        f_stmtNum = ProbReader.stmtSetSize -1 * coveredStmtSetPerc 
-        f_faultNum =ProbReader.fauktSetSize -1 * coveredFaultSetPerc
+        f_stmtNum =  -1.0 * coveredStmtSetPerc 
+        f_faultNum = -1.0 * coveredFaultSetPerc
         
-        f_testNum = abs(sum(x) - NSGA2_triCriteria.AllowPerc* ProbReader.testSuiteSize) 
+        f_testNum = abs(sum(x) - MOEAD_triCriteria.AllowPerc* ProbReader.testSuiteSize) 
         #ci1 = x[0]-1
         return [f_stmtNum, f_faultNum,f_testNum]#, ci1]
 
@@ -54,7 +55,7 @@ class NSGA2_triCriteria:
 
     # Return function name
     def get_name(self):
-        return "NSGA II for the tri-criteria problem of test-suite minimization!"
+        return "MOEA/D for the tri-criteria problem of test-suite minimization!"
 
     #def get_nic(self):
     #    return 1
@@ -71,12 +72,12 @@ if __name__ == "__main__":
     reader.load()
     
     # create UDP
-    prob = pg.problem(NSGA2_triCriteria())
+    prob = pg.problem(MOEAD_triCriteria())
     print (prob)
     # create population
-    pop = pg.population(prob, size=100)
+    pop = pg.population(prob, size=91)
     # select algorithm
-    algo = pg.algorithm(pg.nsga2(gen=2000))
+    algo = pg.algorithm(pg.moead(gen=2000))
     # run optimization
     pop = algo.evolve(pop)
     # extract results
@@ -93,6 +94,6 @@ if __name__ == "__main__":
     print (type(fits))
     print(ndf) 
 else:
-    print("nsga2_triCriteria.py is being imported into another module")
+    print("moeaD_triCriteria.py is being imported into another module")
     
     
