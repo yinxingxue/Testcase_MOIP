@@ -7,6 +7,8 @@ Created on Tue Dec 18 21:02:40 2018
 import pygmo as pg
 from probReader import ProbReader
 import numpy as np
+import math
+import os
    
 class MOEAD_triCriteria:
     
@@ -38,10 +40,11 @@ class MOEAD_triCriteria:
             coveredFaultSet.update(ProbReader.testToFaultcaseMap[testCaseName])
         coveredStmtSetPerc =   len(coveredStmtSet) #/ ProbReader.stmtSetSize
         coveredFaultSetPerc =  len(coveredFaultSet) #/ ProbReader.fauktSetSize
-        f_stmtNum =  -1.0 * coveredStmtSetPerc 
-        f_faultNum = -1.0 * coveredFaultSetPerc
+        f_stmtNum = ProbReader.stmtSetSize -1 * coveredStmtSetPerc 
+        f_faultNum =ProbReader.fauktSetSize -1 * coveredFaultSetPerc
         
-        f_testNum = abs(sum(x) - MOEAD_triCriteria.AllowPerc* ProbReader.testSuiteSize) 
+        allowNum = int(math.floor(MOEAD_triCriteria.AllowPerc* ProbReader.testSuiteSize+0.5))
+        f_testNum = abs(sum(x) - allowNum) 
         #ci1 = x[0]-1
         return [f_stmtNum, f_faultNum,f_testNum]#, ci1]
 
@@ -71,11 +74,15 @@ if __name__ == "__main__":
     #reader = ProbReader('../../../Nemo/example')
     reader.load()
     
+    outputPath='../../result/moea/nsga2/'+ str(MOEAD_triCriteria.AllowPerc)
+    if not os.path.isdir(outputPath):
+        os.makedirs(outputPath)
+        
     # create UDP
     prob = pg.problem(MOEAD_triCriteria())
     print (prob)
     # create population
-    pop = pg.population(prob, size=91)
+    pop = pg.population(prob, size=105)
     # select algorithm
     algo = pg.algorithm(pg.moead(gen=2000))
     # run optimization
@@ -93,6 +100,8 @@ if __name__ == "__main__":
  
     print (type(fits))
     print(ndf) 
+    
+
 else:
     print("moeaD_triCriteria.py is being imported into another module")
     

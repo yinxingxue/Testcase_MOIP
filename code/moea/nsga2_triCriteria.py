@@ -7,6 +7,7 @@ Created on Tue Dec 18 21:02:40 2018
 import pygmo as pg
 from probReader import ProbReader
 import numpy as np
+import math
    
 class NSGA2_triCriteria:
     
@@ -40,7 +41,8 @@ class NSGA2_triCriteria:
         f_stmtNum = ProbReader.stmtSetSize -1 * coveredStmtSetPerc 
         f_faultNum =ProbReader.fauktSetSize -1 * coveredFaultSetPerc
         
-        f_testNum = abs(sum(x) - NSGA2_triCriteria.AllowPerc* ProbReader.testSuiteSize) 
+        allowNum = int(math.floor(NSGA2_triCriteria.AllowPerc* ProbReader.testSuiteSize+0.5))
+        f_testNum = abs(sum(x) - allowNum) 
         #ci1 = x[0]-1
         return [f_stmtNum, f_faultNum,f_testNum]#, ci1]
 
