@@ -92,15 +92,20 @@ if __name__ == "__main__":
     # extract and print non-dominated fronts
     ndf, dl, dc, ndr = pg.fast_non_dominated_sorting(fits)
     np.around(fits,6)
+    frontStr=''
     for fit in fits:
-        print ('[',end="")
         for data in fit:
-            print (str(int(data))+' ',end="")
-        print (']')
- 
+            frontStr+= str(int(data))+'\t' 
+        frontStr+='\n' 
+    print (frontStr)
     print (type(fits))
-    print(ndf) 
+    print (ndf) 
     
+    #file_object = open(outputPath+'/FUN_'+str(i)+'.tsv', "w") 
+    #try: 
+    #    file_object.write(str) 
+    #finally: 
+    #    file_object.close( )
 
 else:
     print("moeaD_triCriteria.py is being imported into another module")
