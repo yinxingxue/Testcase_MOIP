@@ -74,38 +74,39 @@ if __name__ == "__main__":
     #reader = ProbReader('../../../Nemo/example')
     reader.load()
     
-    outputPath='../../result/moea/nsga2/'+ str(MOEAD_triCriteria.AllowPerc)
+    outputPath='../../result/moea/moeaD/'+ str(MOEAD_triCriteria.AllowPerc)
     if not os.path.isdir(outputPath):
         os.makedirs(outputPath)
-        
-    # create UDP
-    prob = pg.problem(MOEAD_triCriteria())
-    print (prob)
-    # create population
-    pop = pg.population(prob, size=105)
-    # select algorithm
-    algo = pg.algorithm(pg.moead(gen=2000))
-    # run optimization
-    pop = algo.evolve(pop)
-    # extract results
-    fits, vectors = pop.get_f(), pop.get_x()
-    # extract and print non-dominated fronts
-    ndf, dl, dc, ndr = pg.fast_non_dominated_sorting(fits)
-    np.around(fits,6)
-    frontStr=''
-    for fit in fits:
-        for data in fit:
-            frontStr+= str(int(data))+'\t' 
-        frontStr+='\n' 
-    print (frontStr)
-    print (type(fits))
-    print (ndf) 
     
-    #file_object = open(outputPath+'/FUN_'+str(i)+'.tsv', "w") 
-    #try: 
-    #    file_object.write(str) 
-    #finally: 
-    #    file_object.close( )
+    for i in range(0,30):      
+        # create UDP
+        prob = pg.problem(MOEAD_triCriteria())
+        print (prob)
+        # create population
+        pop = pg.population(prob, size=105)
+        # select algorithm
+        algo = pg.algorithm(pg.moead(gen=2000))
+        # run optimization
+        pop = algo.evolve(pop)
+        # extract results
+        fits, vectors = pop.get_f(), pop.get_x()
+        # extract and print non-dominated fronts
+        ndf, dl, dc, ndr = pg.fast_non_dominated_sorting(fits)
+        np.around(fits,6)
+        frontStr=''
+        for fit in fits:
+            for data in fit:
+                frontStr+= str(int(data))+'\t' 
+            frontStr+='\n' 
+        print (frontStr)
+        print (type(fits))
+        print (ndf) 
+        
+        file_object = open(outputPath+'/FUN_'+str(i)+'.tsv', "w") 
+        try: 
+            file_object.writelines(frontStr) 
+        finally: 
+            file_object.close( )
 
 else:
     print("moeaD_triCriteria.py is being imported into another module")
