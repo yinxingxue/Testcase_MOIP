@@ -9,6 +9,7 @@ from probReader import ProbReader
 import numpy as np
 import math
 import os
+import sys
    
 class MOEAD_triCriteria:
     
@@ -70,7 +71,14 @@ class MOEAD_triCriteria:
 
 if __name__ == "__main__":
    
-    reader = ProbReader('../../../Nemo/subject_programs/gzip_v5')
+    if len(sys.argv)!=3: 
+        os._exit(0) 
+    para = sys.argv[1]
+    MOEAD_triCriteria.AllowPerc=float(sys.argv[2])
+
+    projectName = para
+    inputPath = '../../../Nemo/subject_programs/{name}_v5'.format(name=projectName)
+    reader = ProbReader(inputPath)
     #reader = ProbReader('../../../Nemo/example')
     reader.load()
     
