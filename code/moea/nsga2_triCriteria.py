@@ -8,8 +8,9 @@ import pygmo as pg
 from probReader import ProbReader
 import numpy as np
 import math
-import os
+import shutil,os
 import sys
+import time
 from subprocess import Popen, PIPE
 
 class NSGA2_triCriteria:
@@ -86,7 +87,8 @@ if __name__ == "__main__":
     if not os.path.isdir(outputPath):
         os.makedirs(outputPath)
     
-    for i in range(0,2):      
+    for i in range(0,2):
+        time_start=time.time()
         # create UDP
         prob = pg.problem(NSGA2_triCriteria())
         print (prob)
@@ -100,9 +102,15 @@ if __name__ == "__main__":
         fits, vectors = pop.get_f(), pop.get_x()
         # extract and print non-dominated fronts
         ndf, dl, dc, ndr = pg.fast_non_dominated_sorting(fits)
+        time_end=time.time()
+        exec_time= time_end- time_start
         np.around(fits,6)
         frontStr=''
+        
+        isOptimal = False 
         for fit in fits:
+            if sum(fit) == 0:
+                isOptimal = True
             for data in fit:
                 frontStr+= str(int(data))+'\t' 
             frontStr+='\n' 
@@ -118,14 +126,33 @@ if __name__ == "__main__":
             file_object.close( )
         
         refPath='../../result/moea/refPnts/'+ str(NSGA2_triCriteria.AllowPerc)+'/'+para+'/'
-        refFilePath = refPath+'ref.pf'
-    
-        cmds='java -jar CMDIndicatorRunner.jar ALL '+ refFilePath + ' '+ outputFilePath+' TRUE'
-        p = Popen(cmds, shell=True, stdout=PIPE, stderr=PIPE)  
-        p.wait()  
-        if p.returncode != 0: 
-            print ("Error.")
-            os._exit(0) 
+        refFilePath = refPath+'ref.pf'     
+            
+        #if it does not contain the optimal solution 
+        if (isOptimal == False):
+            cmds='java -jar CMDIndicatorRunner.jar ALL '+ refFilePath + ' '+ outputFilePath+' TRUE'
+            p = Popen(cmds, shell=True, stdout=PIPE, stderr=PIPE)  
+            p.wait()  
+            if p.returncode != 0: 
+                print ("Error.")
+                os._exit(0) 
+            outputMetricFile = 'FUN_'+str(i)+'_metric.txt'
+            if os.path.exists(outputPath+outputMetricFile):
+                os.remove(outputPath+outputMetricFile)
+            shutil.move(outputMetricFile,outputPath)
+            with open(outputPath+outputMetricFile,'a') as f:
+                f.write('TIME='+str(exec_time)+'\n')
+                f.close( )
+        #else
+        else:
+            tmpOutputMetricFilePath = '../../result/moea/refPnts/'+ 'FUN_metric.txt'
+            outputMetricFile = 'FUN_'+str(i)+'_metric.txt'
+            if os.path.exists(outputPath+outputMetricFile):
+                os.remove(outputPath+outputMetricFile)
+            shutil.copy(tmpOutputMetricFilePath,outputPath+outputMetricFile)
+            with open(outputPath+outputMetricFile,'a') as f:
+                f.write('TIME='+str(exec_time)+'\n')
+                f.close( )
 else:
     print("nsga2_triCriteria.py is being imported into another module")
     
