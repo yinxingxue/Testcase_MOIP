@@ -1,0 +1,5 @@
+#saving the metrics
+#Sat Dec 29 11:10:50 CST 2018
+HV=1
+SPREAD=1
+GSPREAD=1TIME=66.5047869682312
