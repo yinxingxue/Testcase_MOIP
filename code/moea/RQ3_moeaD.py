@@ -72,7 +72,9 @@ if __name__ == "__main__":
             p.wait()  
             if p.returncode != 0: 
                 print ("Error.")
-                os._exit(0) 
+                cmds='java -jar CMDIndicatorRunner.jar ALL '+ refFilePath + ' '+ outputFilePath+' FALSE'
+                p = Popen(cmds, shell=True, stdout=PIPE, stderr=PIPE)  
+                p.wait()
             outputMetricFile = 'FUN_'+str(i)+'_metric.txt'
             if os.path.exists(outputPath+outputMetricFile):
                 os.remove(outputPath+outputMetricFile)
