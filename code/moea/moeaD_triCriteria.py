@@ -24,15 +24,15 @@ class MOEAD_triCriteria:
         
     # Define objectives
     def fitness(self, x):
-        f_stmtNum = 0
-        f_faultNum = 0
-        f_testNum = 0
+        f_stmtNum = 10000
+        f_faultNum = 10000
+        f_testNum = 10000
         
         coveredStmtSet = set() 
         coveredFaultSet = set() 
        
         for i in range(0,ProbReader.testSuiteSize):
-            if x[i] == 0.0 or x[i] < 0.5:
+            if x[i] == 0.0 or x[i] < 0.00000001:
                 continue
             
             testCaseName = ProbReader.testCaseNameList[i]
