@@ -99,6 +99,43 @@ def calculateDistance(referencePoint,point):
     distance =    math.sqrt(distance)
     return distance
 
+def normalizedHV(hvList1,hvList2):
+    normalizedHVList1 = []
+    normalizedHVList2 = []
+    bestHV = -1 
+    for hv in hvList1:
+        if hv > bestHV:
+            bestHV= hv
+    for hv in hvList2:
+        if hv > bestHV:
+            bestHV= hv
+    
+    normalizedHVList1 = list(map(lambda x:x*1.0/bestHV,hvList1))
+    normalizedHVList2 = list(map(lambda x:x*1.0/bestHV,hvList2))
+    return normalizedHVList1,normalizedHVList2
+
+def readMetric(rstRaw):
+    spread = 0
+    execTime = -1
+    try:
+        pro_file = open(rstRaw, 'Ur')
+        for line in pro_file.readlines():
+            line = line.strip().replace('\n', '')
+            if line.find("#")!=-1:
+                line=line[0:line.find('#')]
+            if line.find('=') > 0:
+                strs = line.split('=')
+                strs[1]= line[len(strs[0])+1:]
+                if strs[0]== 'GSPREAD':
+                    spread= float(strs[1])
+                if strs[0]== 'TIME':
+                    execTime= float(strs[1])
+    except IOError:
+        print ("error in read the metric file")
+    else:
+        pro_file.close()
+    return  spread, execTime  
+
 if __name__ == "__main__":
    
     if len(sys.argv)!=3: 
@@ -142,9 +179,21 @@ if __name__ == "__main__":
         result2 = hv2.compute(worstPoint, hv_algo= pg.hv3d())
         hvList2.append(result2)
     
-    hvs = normalizedHV(hvList1,hvList2)
+    normalizedHVList1,normalizedHVList2 = normalizedHV(hvList1,hvList2)
     
-    
+    spreadList1 = []
+    spreadList2 = []
+    execTimeList1 = [] 
+    execTimeList2 = [] 
+    for i in range(0,30):
+        rst1_metric = rst1Path+'FUN_'+str(i)+'_metric.txt'
+        rst2_metric = rst2Path+'FUN_'+str(i)+'_metric.txt'
+        spread1, execTime1 = readMetric(rst1_metric)
+        spread2, execTime2 = readMetric(rst2_metric)
+        spreadList1.append(spread1)
+        spreadList2.append(spread2)
+        execTimeList1.append(execTime1)
+        execTimeList2.append(execTime2)
 else:
     print("RQ3_RstComparator.py is being imported into another module")
     
