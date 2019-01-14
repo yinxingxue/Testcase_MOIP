@@ -32,7 +32,7 @@ class MOEAD_triCriteria:
         coveredFaultSet = set() 
        
         for i in range(0,ProbReader.testSuiteSize):
-            if x[i] == 0.0 or x[i] < 0.00000001:
+            if x[i] == 0.0 or x[i] < 0.5:
                 continue
             
             testCaseName = ProbReader.testCaseNameList[i]
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         # create population
         pop = pg.population(prob, size=105)
         # select algorithm
-        algo = pg.algorithm(pg.moead(gen=2000))
+        algo = pg.algorithm(pg.moead(gen=1981))
         # run optimization
         pop = algo.evolve(pop)
         # extract results
