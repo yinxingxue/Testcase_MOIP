@@ -148,7 +148,7 @@ def readMetric(rstRaw):
     spread = 0
     execTime = -1
     try:
-        pro_file = open(rstRaw, 'Ur')
+        pro_file = open(rstRaw, 'r')
         for line in pro_file.readlines():
             line = line.strip().replace('\n', '')
             if line.find("#")!=-1:
@@ -233,9 +233,15 @@ if __name__ == "__main__":
     meanHV2 = np.mean(normalizedHVList2)
     meanET1 = np.mean(execTimeList1)
     meanET2 = np.mean(execTimeList2)
-    print (meanHV1,meanHV2)
-    print (meanET1,meanET2)
-    print (hv_pVal,time_pVal)
+    print ('meanHV: ',meanHV1,meanHV2)
+    print ('meanET: ',meanET1,meanET2)
+    print ('p__Val: ',hv_pVal,time_pVal)
+    
+    with open(outputPath+'comp_'+str(allowPerc)+'_'+projectName+'.txt','w') as f:
+        f.write('meanHV: '+'\t'+ str(meanHV1)+ '\t'+str(meanHV2)+'\n')
+        f.write('meanET: '+'\t'+ str(meanET1)+ '\t'+str(meanET2)+'\n')
+        f.write('p__Val: '+'\t'+ str(hv_pVal)+ '\t'+str(time_pVal)+'\n')
+        f.close( )
 else:
     print("RQ3_RstComparator.py is being imported into another module")
     
