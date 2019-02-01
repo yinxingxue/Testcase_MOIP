@@ -55,8 +55,14 @@ def filterByTrueFront(trueDistrMap,distrMap):
             trueInDistrMap[key] = distrMap[key]
     return trueInDistrMap
 
+def containsMap(countedMap,trueDistrMap):
+    'check whether all keys in trueDistrMap are also in countedMap'
+    for key in trueDistrMap:
+        if key not in countedMap:   
+            return False
+    return True
     
-def getTestsizeAndFaults(frontList1,frontList2):
+def getTestsizeAndFaults(frontList1,frontList2,trueDistrMap):
     
     'get the base point'
     dimension1=  ProbReader.stmtSetSize
@@ -65,7 +71,11 @@ def getTestsizeAndFaults(frontList1,frontList2):
     distrMap1 = {}
     distrMap2 = {}
     
+    exeID =-1
+    trueFrontExes1 = []
+    trueFrontExes2 = []
     for front in frontList1:
+        exeID += 1
         countedMap={}
         for point in front: 
             stmtSize = dimension1 - point[0]
@@ -84,10 +94,14 @@ def getTestsizeAndFaults(frontList1,frontList2):
                 continue
             elif key not in distrMap1 and key in countedMap:
                 print('error')
-                os._exit(0) 
+                os._exit(0)
+        if len(trueDistrMap) <= len(countedMap) and containsMap(countedMap,trueDistrMap) == True:
+            trueFrontExes1.append(exeID)
         countedMap.clear()
-            
+    
+    exeID =-1        
     for front in frontList2:
+        exeID += 1
         countedMap={}
         for point in front: 
             stmtSize = dimension1 - point[0]
@@ -107,9 +121,11 @@ def getTestsizeAndFaults(frontList1,frontList2):
             elif key not in distrMap2 and key in countedMap:
                 print('error')
                 os._exit(0) 
+        if len(trueDistrMap) <= len(countedMap) and containsMap(countedMap,trueDistrMap) == True:
+            trueFrontExes2.append(exeID)
         countedMap.clear()
    
-    return distrMap1, distrMap2
+    return distrMap1, distrMap2,trueFrontExes1,trueFrontExes2
 
 if __name__ == "__main__":
    
@@ -146,7 +162,7 @@ if __name__ == "__main__":
         #print (front2)
         frontList1.append(front1)
         frontList2.append(front2)
-    distrMap1, distrMap2 = getTestsizeAndFaults(frontList1,frontList2)  
+    distrMap1, distrMap2,trueFrontExes1,trueFrontExes2 = getTestsizeAndFaults(frontList1,frontList2,trueDistrMap)  
     
     trueInDistrMap1 = filterByTrueFront(trueDistrMap,distrMap1)
     trueInDistrMap2 = filterByTrueFront(trueDistrMap,distrMap2)
@@ -160,6 +176,10 @@ if __name__ == "__main__":
         f.write(str(distrMap1)+'\n')
         f.write('Correct Solution in Front 2:\n')
         f.write(str(distrMap2)+'\n')
+        f.write('Executtions of 1 find the True Complete Front:\n')
+        f.write(str(trueFrontExes1)+'\n')
+        f.write('Executtions of 2 find the True Complete Front:\n')
+        f.write(str(trueFrontExes2)+'\n')
         f.close( )
 else:
     print("RQ3_IP_Comparator.py is being imported into another module")
