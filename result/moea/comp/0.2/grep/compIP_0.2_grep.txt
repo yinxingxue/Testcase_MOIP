@@ -1,0 +1,8 @@
+True Pareto in Front 1:
+{'1695_54': 30}
+True Pareto in Front 2:
+{}
+Correct Solution in Front 1:
+{'1695_54': 30}
+Correct Solution in Front 2:
+{}

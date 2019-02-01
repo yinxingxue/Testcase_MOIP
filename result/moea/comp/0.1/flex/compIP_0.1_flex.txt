@@ -1,0 +1,8 @@
+True Pareto in Front 1:
+{'3143_37': 30}
+True Pareto in Front 2:
+{}
+Correct Solution in Front 1:
+{'3143_37': 30}
+Correct Solution in Front 2:
+{}

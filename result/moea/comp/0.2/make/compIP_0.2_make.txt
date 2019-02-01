@@ -1,0 +1,8 @@
+True Pareto in Front 1:
+{'3803_15': 30}
+True Pareto in Front 2:
+{'3803_15': 28}
+Correct Solution in Front 1:
+{'3803_15': 30}
+Correct Solution in Front 2:
+{'3803_15': 28, '3802_15': 1, '3802_14': 1, '3801_15': 1, '3803_14': 1, '3801_14': 1}

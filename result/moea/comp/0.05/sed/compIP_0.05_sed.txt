@@ -1,0 +1,8 @@
+True Pareto in Front 1:
+{'945_25': 30}
+True Pareto in Front 2:
+{'945_25': 1}
+Correct Solution in Front 1:
+{'945_25': 30}
+Correct Solution in Front 2:
+{'945_25': 1, '927_23': 1, '925_23': 1, '944_23': 1, '943_23': 1, '939_23': 1}
