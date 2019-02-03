@@ -2,8 +2,8 @@
 <!DOCTYPE log SYSTEM "logger.dtd">
 <log>
 <record>
-  <date>2019-01-23T07:35:38</date>
-  <millis>1548200138214</millis>
+  <date>2019-02-03T12:12:19</date>
+  <millis>1549167139431</millis>
   <sequence>0</sequence>
   <logger>org.uma.jmetal.util.JMetalLogger</logger>
   <level>INFO</level>
@@ -13,19 +13,19 @@
   <message>Loggers configured with null</message>
 </record>
 <record>
-  <date>2019-01-23T07:35:38</date>
-  <millis>1548200138237</millis>
+  <date>2019-02-03T12:12:19</date>
+  <millis>1549167139455</millis>
   <sequence>1</sequence>
   <logger>org.uma.jmetal.util.JMetalLogger</logger>
   <level>INFO</level>
   <class>edu.ustc.moea.qualityIndicator.CommandLineIndicatorRunner</class>
   <method>calculateAndPrintIndicators</method>
   <thread>1</thread>
-  <message>The fronts are NOT NORMALIZED before computing the indicators</message>
+  <message>The fronts are NORMALIZED before computing the indicators</message>
 </record>
 <record>
-  <date>2019-01-23T07:35:38</date>
-  <millis>1548200138259</millis>
+  <date>2019-02-03T12:12:19</date>
+  <millis>1549167139479</millis>
   <sequence>2</sequence>
   <logger>org.uma.jmetal.util.JMetalLogger</logger>
   <level>INFO</level>
@@ -35,8 +35,8 @@
   <message>SC(refPF, front): 1.0</message>
 </record>
 <record>
-  <date>2019-01-23T07:35:38</date>
-  <millis>1548200138260</millis>
+  <date>2019-02-03T12:12:19</date>
+  <millis>1549167139480</millis>
   <sequence>3</sequence>
   <logger>org.uma.jmetal.util.JMetalLogger</logger>
   <level>INFO</level>

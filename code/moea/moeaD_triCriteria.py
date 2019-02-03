@@ -45,7 +45,8 @@ class MOEAD_triCriteria:
         f_faultNum =ProbReader.fauktSetSize -1 * coveredFaultSetPerc
         
         allowNum = int(math.floor(MOEAD_triCriteria.AllowPerc* ProbReader.testSuiteSize+0.5))
-        f_testNum = abs(sum(x) - allowNum) 
+        round_x =  map(round, x)  
+        f_testNum = abs(sum(round_x) - allowNum) 
         #ci1 = x[0]-1
         return [f_stmtNum, f_faultNum,f_testNum]#, ci1]
 
@@ -106,6 +107,7 @@ if __name__ == "__main__":
             for data in fit:
                 frontStr+= str(int(data))+'\t' 
             frontStr+='\n' 
+        print (vectors)
         print (frontStr)
         print (type(fits))
         print (ndf) 
