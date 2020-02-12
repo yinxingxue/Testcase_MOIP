@@ -1,5 +1,5 @@
 1. ### Requirement:
-Python >= 3.6, Cplex >= 12.5, pygmo>2.1
+Python >= 3.6, Cplex >= 12.8, pygmo==2.1 (we find that pygmo 2.13 has some severe issues that cause the code using MOEAs to crash)
 
 2. ###  The necessity to install Cplex 12.5 and above:
 Academic license that can support problems with more than 1000 decisive variables for the ILP methods, and Set up the Python API of CPLEX https://www.ibm.com/support/knowledgecenter/SSSA5P_12.7.1/ilog.odms.cplex.help/CPLEX/GettingStarted/topics/set_up/Python_setup.html
