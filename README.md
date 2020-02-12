@@ -5,6 +5,7 @@ Python >= 3.6, Cplex >= 12.5, pygmo>2.1
 Academic license that can support problems with more than 1000 decisive variables for the ILP methods, and Set up the Python API of CPLEX https://www.ibm.com/support/knowledgecenter/SSSA5P_12.7.1/ilog.odms.cplex.help/CPLEX/GettingStarted/topics/set_up/Python_setup.html
 
 3. ### The necessity to install Pagmo & Pygmo 2.0 and above: 
+in anaconda we can install via this command: tpip install pygmo
 For the MOEA methods, the link is https://esa.github.io/pagmo2/
 
 4. ### To reproduce the RQ1:
