@@ -1,0 +1,12 @@
+True Pareto in Front 1:
+{'1695_54': 13}
+True Pareto in Front 2:
+{}
+Correct Solution in Front 1:
+{'1694_52': 6, '1695_54': 13, '1695_53': 8, '1693_54': 3, '1695_52': 3, '1692_54': 6, '1694_54': 8, '1694_53': 3, '1695_51': 6, '1693_53': 6}
+Correct Solution in Front 2:
+{}
+Executtions of 1 find the True Complete Front:
+[2, 4, 5, 8, 9, 14, 15, 16, 21, 22, 23, 27, 28]
+Executtions of 2 find the True Complete Front:
+[]

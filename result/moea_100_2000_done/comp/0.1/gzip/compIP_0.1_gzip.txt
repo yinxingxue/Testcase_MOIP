@@ -1,0 +1,12 @@
+True Pareto in Front 1:
+{'1401_55': 28, '1404_50': 1, '1400_56': 28, '1402_54': 18, '1403_53': 5}
+True Pareto in Front 2:
+{}
+Correct Solution in Front 1:
+{'1401_55': 28, '1403_51': 4, '1402_54': 18, '1401_54': 1, '1401_50': 1, '1402_52': 3, '1400_56': 28, '1400_55': 2, '1403_53': 5, '1402_51': 1, '1404_50': 1, '1403_49': 1, '1399_56': 2}
+Correct Solution in Front 2:
+{}
+Executtions of 1 find the True Complete Front:
+[]
+Executtions of 2 find the True Complete Front:
+[]
