@@ -6,7 +6,10 @@ Academic license that can support problems with more than 1000 decisive variable
 
 3. ### The necessity to install Pagmo & Pygmo 2.0 and above: 
 
-in anaconda we can install via this command: pip install pygmo==2.1
+in anaconda we can install via this command: 
+
+	pip install pygmo==2.1
+	
 For the MOEA methods, the link is https://esa.github.io/pagmo2/
 
 ###Besides, the input files for the MCTSM problem is from the Nemo Project: https://github.com/jwlin/Nemo
