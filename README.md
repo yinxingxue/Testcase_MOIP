@@ -1,11 +1,12 @@
 1. ### Requirement:
 Python >= 3.6, Cplex >= 12.8, pygmo==2.1 (we find that pygmo 2.13 has some severe issues that cause the code using MOEAs to crash)
 
-2. ###  The necessity to install Cplex 12.5 and above:
+2. ###  The necessity to install Cplex 12.8 and above:
 Academic license that can support problems with more than 1000 decisive variables for the ILP methods, and Set up the Python API of CPLEX https://www.ibm.com/support/knowledgecenter/SSSA5P_12.7.1/ilog.odms.cplex.help/CPLEX/GettingStarted/topics/set_up/Python_setup.html
 
 3. ### The necessity to install Pagmo & Pygmo 2.0 and above: 
-in anaconda we can install via this command: pip install pygmo
+
+in anaconda we can install via this command: pip install pygmo==2.1
 For the MOEA methods, the link is https://esa.github.io/pagmo2/
 
 ###Besides, the input files for the MCTSM problem is from the Nemo Project: https://github.com/jwlin/Nemo
